@@ -5,7 +5,7 @@ services:
     container_name: pozitiv-nginx
     working_dir: /app
     depends_on:
-      - positive-php-fpm83
+      - pozitiv-php-fpm83
     volumes:
       - .:/app
       - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
