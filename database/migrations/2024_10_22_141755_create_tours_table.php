@@ -6,15 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('trips', function (Blueprint $table) {
+        Schema::create('tours', function (Blueprint $table) {
             $table->id();
-            $table->integer('price');
-            $table->integer('places_count');
+            $table->text('description');
             $table->timestamps();
         });
     }
@@ -24,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trips');
+        Schema::dropIfExists('tours');
     }
 };
