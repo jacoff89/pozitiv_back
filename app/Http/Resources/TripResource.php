@@ -16,7 +16,7 @@ class TripResource extends JsonResource
     {
         return [
             'id' =>$this->id,
-            'name' => $this->price,
+            'price' => $this->price,
             'places_count' => $this->places_count
         ];
     }

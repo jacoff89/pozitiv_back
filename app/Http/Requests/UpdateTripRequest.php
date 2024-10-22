@@ -23,10 +23,7 @@ class UpdateTripRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'price' => 'required',
-            'places_count' => 'required'
-        ];
+        return [];
     }
 
     public function failedValidation(Validator $validator)

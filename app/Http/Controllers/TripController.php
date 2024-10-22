@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
-use App\Models\Trip;
 use App\Interfaces\TripRepositoryInterface;
 use App\Classes\ApiResponseClass as ResponseClass;
 use App\Http\Resources\TripResource;
-
 use Illuminate\Support\Facades\DB;
 
 class TripController extends Controller
@@ -32,14 +30,6 @@ class TripController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTripRequest $request)
@@ -53,7 +43,7 @@ class TripController extends Controller
             $trip = $this->tripRepositoryInterface->store($details);
 
             DB::commit();
-            return ResponseClass::sendResponse(new TripResource($trip), 'Product Create Successful', 201);
+            return ResponseClass::sendResponse(new TripResource($trip), 'Trip Create Successful', 201);
 
         } catch (\Exception $ex) {
             return ResponseClass::rollback($ex);
@@ -71,28 +61,22 @@ class TripController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Trip $trip)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateTripRequest $request, $id)
     {
-        $updateDetails = [
-            'price' => $request->price,
-            'places_count' => $request->places_count
-        ];
+        $updateDetails = [];
+        if ($request->price) $updateDetails['price'] = $request->price;
+        if ($request->places_count) $updateDetails['places_count'] = $request->places_count;
+        if(empty($updateDetails)) {
+            return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
+        }
         DB::beginTransaction();
         try {
             $trip = $this->tripRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
-            return ResponseClass::sendResponse('Product Update Successful', '', 201);
+            return ResponseClass::sendResponse(new TripResource($trip), 'Trip Update Successful', 201);
 
         } catch (\Exception $ex) {
             return ResponseClass::rollback($ex);
@@ -104,8 +88,9 @@ class TripController extends Controller
      */
     public function destroy($id)
     {
-        $this->tripRepositoryInterface->delete($id);
-
-        return ResponseClass::sendResponse('Product Delete Successful','',204);
+        if ($this->tripRepositoryInterface->delete($id)) {
+            return ResponseClass::sendResponse('Trip Delete Successful', '', 201);
+        }
+        return ResponseClass::sendResponse('Trip is missing', '', 404);
     }
 }
