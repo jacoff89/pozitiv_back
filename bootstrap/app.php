@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
-            '/wp-json/pozitiv/v1/*',
+            //
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

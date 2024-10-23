@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTripRequest;
 use App\Interfaces\TripRepositoryInterface;
 use App\Classes\ApiResponseClass as ResponseClass;
 use App\Http\Resources\TripResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TripController extends Controller
@@ -24,9 +25,10 @@ class TripController extends Controller
      */
     public function index()
     {
+        dd(Auth::user());
         $data = $this->tripRepositoryInterface->index();
 
-        return ResponseClass::sendResponse(TripResource::collection($data), '', 200);
+        return ResponseClass::sendResponse(TripResource::collection($data));
     }
 
     /**
@@ -58,7 +60,7 @@ class TripController extends Controller
     {
         $trip = $this->tripRepositoryInterface->getById($id);
 
-        return ResponseClass::sendResponse(new TripResource($trip), '', 200);
+        return ResponseClass::sendResponse(new TripResource($trip));
     }
 
     /**
