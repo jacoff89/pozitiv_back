@@ -5,6 +5,7 @@ use App\Http\Controllers\TripController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\TouristController;
 
 
 Route::prefix('v1')->group(function () {
@@ -18,4 +19,5 @@ Route::prefix('v1')->group(function () {
 
     Route::apiResource('trips', TripController::class);
     Route::apiResource('tours', TourController::class);
+    Route::apiResource('tourists',TouristController::class);
 });
