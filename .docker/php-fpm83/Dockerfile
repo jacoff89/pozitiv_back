@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Install FPM
 RUN apt-get update \
-    && apt-get -y --no-install-recommends install php-zip unzip php8.3-mysql php-sqlite3 php8.3-bcmath php8.3-xml \
+    && apt-get -y --no-install-recommends install php-zip unzip php8.3-mysql php-sqlite3 php8.3-bcmath php8.3-xml php8.3-gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 

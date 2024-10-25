@@ -9,7 +9,7 @@ use App\Interfaces\ReviewRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use App\Classes\ApiResponseClass as ResponseClass;
 use Illuminate\Support\Facades\Storage;
-use Nette\Utils\Image;
+use Buglinjo\LaravelWebp\Webp;
 
 class ReviewController extends Controller
 {
@@ -37,14 +37,16 @@ class ReviewController extends Controller
     public function store(StoreReviewRequest $request)
     {
         $img = $request->img->store('img/review', 'public');
+        $imgWebp = 'img/review/' . basename($img, ".jpg") . '.webp';
+        (Webp::make($request->img))->save(Storage::disk('public')->path($imgWebp));
+
         $details = [
             'name' => $request->name,
             'text' => $request->text,
             'link' => $request->link,
             'img' => $img,
-            'imgWebp' => $request->imgWebp,
+            'imgWebp' => $imgWebp,
         ];
-        DB::beginTransaction();
         try {
             $trip = $this->reviewRepositoryInterface->store($details);
 
