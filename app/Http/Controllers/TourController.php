@@ -65,7 +65,7 @@ class TourController extends Controller
     public function update(UpdateTourRequest $request, $id)
     {
         $updateDetails = [];
-        if ($request->price) $updateDetails['description'] = $request->description;
+        if ($request->description) $updateDetails['description'] = $request->description;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
         }

@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Interfaces\ReviewRepositoryInterface;
 use App\Interfaces\TourRepositoryInterface;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\TripRepositoryInterface;
+use App\Repositories\ReviewRepository;
 use App\Repositories\TourRepository;
 use App\Repositories\TouristRepository;
 use App\Repositories\TripRepository;
@@ -20,6 +22,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TripRepositoryInterface::class, TripRepository::class);
         $this->app->bind(TourRepositoryInterface::class, TourRepository::class);
         $this->app->bind(TouristRepositoryInterface::class, TouristRepository::class);
+        $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
     }
 
     /**
