@@ -28,7 +28,7 @@ class ReviewController extends Controller
     {
         $data = $this->reviewRepositoryInterface->index();
 
-        return ResponseClass::sendResponse(ReviewResource::collection($data), '', 200);
+        return ResponseClass::sendResponse(ReviewResource::collection($data));
     }
 
     /**
@@ -66,7 +66,7 @@ class ReviewController extends Controller
     {
         $trip = $this->reviewRepositoryInterface->getById($id);
 
-        return ResponseClass::sendResponse(new ReviewResource($trip), '', 200);
+        return ResponseClass::sendResponse(new ReviewResource($trip));
     }
 
     /**

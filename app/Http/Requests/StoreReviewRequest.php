@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreReviewRequest extends FormRequest
 {
@@ -25,8 +27,15 @@ class StoreReviewRequest extends FormRequest
             'name' => 'required',
             'text' => 'required',
             'link' => 'required',
-            'img' => 'required|image',
-            'imgWebp' => 'required'
+            'img' => 'required|image'
         ];
+    }
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Validation errors',
+            'data'      => $validator->errors()
+        ]));
     }
 }
