@@ -34,8 +34,21 @@ class TourController extends Controller
      */
     public function store(StoreTourRequest $request)
     {
+        foreach ($request->images as $value) {
+            $images[] = $value->store('img/tour', 'public');
+        }
+
+        $planPictureImg = $request->planPicture->store('img/tour_planPicture', 'public');
+
         $details = [
-            'description' => $request->description
+            'name' => $request->name,
+            'description' => $request->description,
+            'duration' => $request->duration,
+            'place' => $request->place,
+            'plan' => $request->plan,
+            'planPicture' => $planPictureImg,
+            'season' => $request->season,
+            'images' => $images,
         ];
         DB::beginTransaction();
         try {
@@ -64,8 +77,21 @@ class TourController extends Controller
      */
     public function update(UpdateTourRequest $request, $id)
     {
+        foreach ($request->images as $value) {
+            $images[] = $value->store('img/tour', 'public');
+        }
+
+        $planPictureImg = $request->planPicture->store('img/tour_planPicture', 'public');
+
         $updateDetails = [];
+        if ($request->name) $updateDetails['name'] = $request->name;
         if ($request->description) $updateDetails['description'] = $request->description;
+        if ($request->duration) $updateDetails['duration'] = $request->duration;
+        if ($request->place) $updateDetails['place'] = $request->place;
+        if ($request->plan) $updateDetails['plan'] = $request->plan;
+        if ($request->season) $updateDetails['season'] = $request->season;
+        if ($request->images) $updateDetails['images'] = $images;
+        if ($request->planPicture) $updateDetails['planPicture'] = $planPictureImg;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
         }

@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('trips', function (Blueprint $table) {
             $table->id();
-            $table->integer('price');
-            $table->integer('places_count');
+            $table->integer('cost');
+            $table->integer('minCost');
+            $table->date('dateStart');
+            $table->date('dateEnd');
+            $table->integer('touristLimit');
             $table->unsignedBigInteger('tour_id');
             $table->timestamps();
             $table->foreign('tour_id')->references('id')->on('tours');

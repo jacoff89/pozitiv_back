@@ -24,7 +24,13 @@ class StoreTourRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => 'required'
+            'name' => 'required',
+            'description' => 'required',
+            'duration' => 'required',
+            'place' => 'required',
+            'plan' => 'required',
+            'season' => 'required',
+            'images.*' => 'required|image',
         ];
     }
 

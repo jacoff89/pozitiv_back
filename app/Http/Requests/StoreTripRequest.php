@@ -24,8 +24,12 @@ class StoreTripRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => 'required',
-            'places_count' => 'required'
+            'cost' => 'required',
+            'minCost' => 'required',
+            'dateStart' => 'required',
+            'dateEnd' => 'required',
+            'touristLimit' => 'required',
+            'tour_id' => 'required',
         ];
     }
 

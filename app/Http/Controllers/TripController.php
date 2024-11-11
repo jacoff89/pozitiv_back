@@ -35,9 +35,12 @@ class TripController extends Controller
     public function store(StoreTripRequest $request)
     {
         $details = [
-            'price' => $request->price,
-            'places_count' => $request->places_count,
-            'tour_id' => $request->tour_id
+            'cost' => $request->cost,
+            'minCost' => $request->minCost,
+            'dateStart' => $request->dateStart,
+            'dateEnd' => $request->dateEnd,
+            'touristLimit' => $request->touristLimit,
+            'tour_id' => $request->tour_id,
         ];
         DB::beginTransaction();
         try {
@@ -67,8 +70,11 @@ class TripController extends Controller
     public function update(UpdateTripRequest $request, $id)
     {
         $updateDetails = [];
-        if ($request->price) $updateDetails['price'] = $request->price;
-        if ($request->places_count) $updateDetails['places_count'] = $request->places_count;
+        if ($request->cost) $updateDetails['cost'] = $request->cost;
+        if ($request->minCost) $updateDetails['minCost'] = $request->minCost;
+        if ($request->dateStart) $updateDetails['dateStart'] = $request->dateStart;
+        if ($request->dateEnd) $updateDetails['dateEnd'] = $request->dateEnd;
+        if ($request->touristLimit) $updateDetails['touristLimit'] = $request->touristLimit;
         if ($request->tour_id) $updateDetails['tour_id'] = $request->tour_id;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);

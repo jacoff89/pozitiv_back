@@ -14,6 +14,10 @@ class Tour extends Model
 
     ];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     /**
      * Получить поездки.
      */

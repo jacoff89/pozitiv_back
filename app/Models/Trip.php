@@ -14,6 +14,11 @@ class Trip extends Model
 
     ];
 
+    protected $casts = [
+        'dateStart' => 'date:d.m.Y',
+        'dateEnd' => 'date:d.m.Y',
+    ];
+
     /**
      * Получить тур, которому принадлежит поездка.
      */

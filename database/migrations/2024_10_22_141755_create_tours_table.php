@@ -10,7 +10,14 @@ return new class extends Migration
     {
         Schema::create('tours', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->text('description');
+            $table->string('duration');
+            $table->string('place');
+            $table->text('plan');
+            $table->string('planPicture');
+            $table->enum('season', ['winter','summer']);
+            $table->json('images');
             $table->timestamps();
         });
     }

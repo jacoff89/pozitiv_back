@@ -9,7 +9,7 @@ class TourRepository implements TourRepositoryInterface
 {
     public function index()
     {
-        return Tour::all();
+        return Tour::with('trips')->get();
     }
 
     public function getById($id)
