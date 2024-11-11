@@ -78,9 +78,17 @@ class ReviewController extends Controller
         if ($request->name) $updateDetails['name'] = $request->name;
         if ($request->text) $updateDetails['text'] = $request->text;
         if ($request->link) $updateDetails['link'] = $request->link;
-        if ($request->img) $updateDetails['img'] = $request->img;
-        if ($request->imgWebp) $updateDetails['imgWebp'] = $request->imgWebp;
-        if(empty($updateDetails)) {
+
+        if ($request->img) {
+            $img = $request->img->store('img/review', 'public');
+            $imgWebp = 'img/review/' . basename($img, ".jpg") . '.webp';
+            (Webp::make($request->img))->save(Storage::disk('public')->path($imgWebp));
+
+            $updateDetails['img'] = $img;
+            $updateDetails['imgWebp'] = $imgWebp;
+        }
+
+        if (empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
         }
         DB::beginTransaction();
