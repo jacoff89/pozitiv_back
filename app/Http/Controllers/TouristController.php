@@ -35,7 +35,10 @@ class TouristController extends Controller
     public function store(StoreTouristRequest $request)
     {
         $details = [
-            'name' => $request->name
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
+            'user_id' => $request->user_id,
         ];
         DB::beginTransaction();
         try {
@@ -65,7 +68,10 @@ class TouristController extends Controller
     public function update(UpdateTouristRequest $request, $id)
     {
         $updateDetails = [];
-        if ($request->name) $updateDetails['name'] = $request->name;
+        if ($request->first_name) $updateDetails['first_name'] = $request->first_name;
+        if ($request->last_name) $updateDetails['last_name'] = $request->last_name;
+        if ($request->phone) $updateDetails['phone'] = $request->phone;
+        if ($request->user_id) $updateDetails['user_id'] = $request->user_id;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
         }

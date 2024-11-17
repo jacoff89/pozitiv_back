@@ -21,7 +21,7 @@ class ReviewResource extends JsonResource
             'text' => $this->text,
             'link' => $this->link,
             'img' => Storage::disk('public')->url($this->img),
-            'imgWebp' => Storage::disk('public')->url($this->imgWebp)
+            'img_webp' => Storage::disk('public')->url($this->img_webp)
         ];
     }
 }

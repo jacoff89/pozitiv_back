@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('tourists', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('phone');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

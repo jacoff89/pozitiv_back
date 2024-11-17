@@ -7,9 +7,9 @@ use App\Interfaces\ReviewRepositoryInterface;
 
 class ReviewRepository implements ReviewRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter)
     {
-        return Review::all();
+        return $filter->apply(Review::query(), $queryParams)->get();
     }
 
     public function getById($id)

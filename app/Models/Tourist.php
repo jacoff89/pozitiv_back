@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tourist extends Model
 {
@@ -12,4 +13,12 @@ class Tourist extends Model
     protected $guarded = [
 
     ];
+
+    /**
+     * Получить юзера, который создал туриста.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

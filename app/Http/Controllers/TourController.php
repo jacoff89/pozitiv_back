@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class TourController extends Controller
 {
-
     private TourRepositoryInterface $tourRepositoryInterface;
 
     public function __construct(TourRepositoryInterface $tourRepositoryInterface)
@@ -38,7 +37,7 @@ class TourController extends Controller
             $images[] = $value->store('img/tour', 'public');
         }
 
-        $planPictureImg = $request->planPicture->store('img/tour_planPicture', 'public');
+        $plan_picture_img = $request->plan_picture->store('img/tour_plan_picture', 'public');
 
         $details = [
             'name' => $request->name,
@@ -46,7 +45,7 @@ class TourController extends Controller
             'duration' => $request->duration,
             'place' => $request->place,
             'plan' => $request->plan,
-            'planPicture' => $planPictureImg,
+            'plan_picture' => $plan_picture_img,
             'season' => $request->season,
             'images' => $images,
         ];
@@ -81,7 +80,7 @@ class TourController extends Controller
             $images[] = $value->store('img/tour', 'public');
         }
 
-        $planPictureImg = $request->planPicture->store('img/tour_planPicture', 'public');
+        $plan_picture_img = $request->plan_picture->store('img/tour_plan_picture', 'public');
 
         $updateDetails = [];
         if ($request->name) $updateDetails['name'] = $request->name;
@@ -91,7 +90,7 @@ class TourController extends Controller
         if ($request->plan) $updateDetails['plan'] = $request->plan;
         if ($request->season) $updateDetails['season'] = $request->season;
         if ($request->images) $updateDetails['images'] = $images;
-        if ($request->planPicture) $updateDetails['planPicture'] = $planPictureImg;
+        if ($request->plan_picture) $updateDetails['plan_picture'] = $plan_picture_img;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
         }

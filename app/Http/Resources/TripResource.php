@@ -17,11 +17,14 @@ class TripResource extends JsonResource
         return [
             'id' =>$this->id,
             'cost' => $this->cost,
-            'minCost' => $this->minCost,
-            'dateStart' => $this->dateStart,
-            'dateEnd' => $this->dateEnd,
-            'touristLimit' => $this->touristLimit,
-            'tour_id' => $this->tour_id,
+            'min_cost' => $this->min_cost,
+            'date_start' => $this->date_start,
+            'date_end' => $this->date_end,
+            'tourist_limit' => $this->tourist_limit,
+            'additional_services' => $this->additional_services,
+            'bonuses' => $this->bonuses,
+            'tour' => $this->tour,
+            'orders' => $this->orders,
         ];
     }
 }

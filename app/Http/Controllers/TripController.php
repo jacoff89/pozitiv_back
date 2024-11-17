@@ -36,10 +36,11 @@ class TripController extends Controller
     {
         $details = [
             'cost' => $request->cost,
-            'minCost' => $request->minCost,
-            'dateStart' => $request->dateStart,
-            'dateEnd' => $request->dateEnd,
-            'touristLimit' => $request->touristLimit,
+            'min_cost' => $request->min_cost,
+            'date_start' => $request->date_start,
+            'date_end' => $request->date_end,
+            'tourist_limit' => $request->tourist_limit,
+            'bonuses' => $request->bonuses,
             'tour_id' => $request->tour_id,
         ];
         DB::beginTransaction();
@@ -71,10 +72,11 @@ class TripController extends Controller
     {
         $updateDetails = [];
         if ($request->cost) $updateDetails['cost'] = $request->cost;
-        if ($request->minCost) $updateDetails['minCost'] = $request->minCost;
-        if ($request->dateStart) $updateDetails['dateStart'] = $request->dateStart;
-        if ($request->dateEnd) $updateDetails['dateEnd'] = $request->dateEnd;
-        if ($request->touristLimit) $updateDetails['touristLimit'] = $request->touristLimit;
+        if ($request->min_cost) $updateDetails['min_cost'] = $request->min_cost;
+        if ($request->date_start) $updateDetails['date_start'] = $request->date_start;
+        if ($request->date_end) $updateDetails['date_end'] = $request->date_end;
+        if ($request->tourist_limit) $updateDetails['tourist_limit'] = $request->tourist_limit;
+        if ($request->bonuses) $updateDetails['bonuses'] = $request->bonuses;
         if ($request->tour_id) $updateDetails['tour_id'] = $request->tour_id;
         if(empty($updateDetails)) {
             return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);

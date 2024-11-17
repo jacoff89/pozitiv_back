@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\ReviewFilter;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Interfaces\ReviewRepositoryInterface;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use App\Classes\ApiResponseClass as ResponseClass;
 use Illuminate\Support\Facades\Storage;
@@ -24,9 +26,9 @@ class ReviewController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(FormRequest $request, ReviewFilter $filter)
     {
-        $data = $this->reviewRepositoryInterface->index();
+        $data = $this->reviewRepositoryInterface->index($request->all(), $filter);
 
         return ResponseClass::sendResponse(ReviewResource::collection($data));
     }
@@ -37,15 +39,15 @@ class ReviewController extends Controller
     public function store(StoreReviewRequest $request)
     {
         $img = $request->img->store('img/review', 'public');
-        $imgWebp = 'img/review/' . basename($img, ".jpg") . '.webp';
-        (Webp::make($request->img))->save(Storage::disk('public')->path($imgWebp));
+        $img_webp = 'img/review/' . basename($img, ".jpg") . '.webp';
+        (Webp::make($request->img))->save(Storage::disk('public')->path($img_webp));
 
         $details = [
             'name' => $request->name,
             'text' => $request->text,
             'link' => $request->link,
             'img' => $img,
-            'imgWebp' => $imgWebp,
+            'img_webp' => $img_webp,
         ];
         try {
             $trip = $this->reviewRepositoryInterface->store($details);
@@ -81,11 +83,11 @@ class ReviewController extends Controller
 
         if ($request->img) {
             $img = $request->img->store('img/review', 'public');
-            $imgWebp = 'img/review/' . basename($img, ".jpg") . '.webp';
-            (Webp::make($request->img))->save(Storage::disk('public')->path($imgWebp));
+            $img_webp = 'img/review/' . basename($img, ".jpg") . '.webp';
+            (Webp::make($request->img))->save(Storage::disk('public')->path($img_webp));
 
             $updateDetails['img'] = $img;
-            $updateDetails['imgWebp'] = $imgWebp;
+            $updateDetails['img_webp'] = $img_webp;
         }
 
         if (empty($updateDetails)) {

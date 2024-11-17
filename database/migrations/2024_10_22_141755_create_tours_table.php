@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('duration');
             $table->string('place');
             $table->text('plan');
-            $table->string('planPicture');
+            $table->string('plan_picture');
             $table->enum('season', ['winter','summer']);
             $table->json('images');
             $table->timestamps();

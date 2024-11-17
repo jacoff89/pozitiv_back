@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('text');
             $table->string('link');
             $table->string('img');
-            $table->string('imgWebp');
+            $table->string('img_webp');
             $table->timestamps();
         });
     }

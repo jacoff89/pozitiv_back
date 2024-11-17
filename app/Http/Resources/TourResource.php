@@ -24,7 +24,7 @@ class TourResource extends JsonResource
             'description' => $this->description,
             'duration' => $this->duration,
             'place' => $this->place,
-            'planPicture' => Storage::disk('public')->url($this->planPicture),
+            'plan_picture' => Storage::disk('public')->url($this->plan_picture),
             'plan' => $this->plan,
             'season' => $this->season,
             'images' => $images,

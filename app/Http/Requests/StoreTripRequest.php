@@ -25,10 +25,10 @@ class StoreTripRequest extends FormRequest
     {
         return [
             'cost' => 'required',
-            'minCost' => 'required',
-            'dateStart' => 'required',
-            'dateEnd' => 'required',
-            'touristLimit' => 'required',
+            'min_cost' => 'required',
+            'date_start' => 'required',
+            'date_end' => 'required',
+            'tourist_limit' => 'required',
             'tour_id' => 'required',
         ];
     }
