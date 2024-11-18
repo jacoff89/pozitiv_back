@@ -50,6 +50,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function roles() {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
+
     /**
      * Получить туристов.
      */
@@ -64,5 +68,10 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->roles()->where('name', 'Admin')->exists();
     }
 }

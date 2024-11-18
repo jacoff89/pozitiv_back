@@ -7,20 +7,20 @@ use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Interfaces\ReviewRepositoryInterface;
+use App\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\DB;
-use App\Classes\ApiResponseClass as ResponseClass;
-use Illuminate\Support\Facades\Storage;
-use Buglinjo\LaravelWebp\Webp;
+use App\Helpers\JsonResponseHelper;
 
 class ReviewController extends Controller
 {
+    private Review $review;
 
     private ReviewRepositoryInterface $reviewRepositoryInterface;
 
-    public function __construct(ReviewRepositoryInterface $reviewRepositoryInterface)
+    public function __construct(ReviewRepositoryInterface $reviewRepositoryInterface, Review $review)
     {
         $this->reviewRepositoryInterface = $reviewRepositoryInterface;
+        $this->review = $review;
     }
 
     /**
@@ -28,9 +28,10 @@ class ReviewController extends Controller
      */
     public function index(FormRequest $request, ReviewFilter $filter)
     {
-        $data = $this->reviewRepositoryInterface->index($request->all(), $filter);
+        $params = $request->only('name');
+        $data = $this->reviewRepositoryInterface->index($params, $filter);
 
-        return ResponseClass::sendResponse(ReviewResource::collection($data));
+        return JsonResponseHelper::success(ReviewResource::collection($data));
     }
 
     /**
@@ -38,26 +39,15 @@ class ReviewController extends Controller
      */
     public function store(StoreReviewRequest $request)
     {
-        $img = $request->img->store('img/review', 'public');
-        $img_webp = 'img/review/' . basename($img, ".jpg") . '.webp';
-        (Webp::make($request->img))->save(Storage::disk('public')->path($img_webp));
+        $this->authorize('create', Review::class);
+        $params = $request->only('name', 'text', 'link');
 
-        $details = [
-            'name' => $request->name,
-            'text' => $request->text,
-            'link' => $request->link,
-            'img' => $img,
-            'img_webp' => $img_webp,
-        ];
         try {
-            $trip = $this->reviewRepositoryInterface->store($details);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new ReviewResource($trip), 'Review Create Successful', 201);
+            $review = $this->reviewRepositoryInterface->store($params, $request->img);
+            return JsonResponseHelper::success(new ReviewResource($review), __('messages.review.added'), 201);
 
         } catch (\Exception $ex) {
-            if (Storage::disk('public')->exists($img)) Storage::disk('public')->delete($img);
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.review.add_err'), 400, $ex->getMessage());
         }
     }
 
@@ -66,9 +56,9 @@ class ReviewController extends Controller
      */
     public function show($id)
     {
-        $trip = $this->reviewRepositoryInterface->getById($id);
+        $review = $this->reviewRepositoryInterface->getById($id);
 
-        return ResponseClass::sendResponse(new ReviewResource($trip));
+        return JsonResponseHelper::success(new ReviewResource($review));
     }
 
     /**
@@ -76,32 +66,19 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, $id)
     {
-        $updateDetails = [];
-        if ($request->name) $updateDetails['name'] = $request->name;
-        if ($request->text) $updateDetails['text'] = $request->text;
-        if ($request->link) $updateDetails['link'] = $request->link;
+        $this->authorize('update', $this->review);
+        $params = $request->only('name', 'text', 'link');
 
-        if ($request->img) {
-            $img = $request->img->store('img/review', 'public');
-            $img_webp = 'img/review/' . basename($img, ".jpg") . '.webp';
-            (Webp::make($request->img))->save(Storage::disk('public')->path($img_webp));
-
-            $updateDetails['img'] = $img;
-            $updateDetails['img_webp'] = $img_webp;
+        if (empty($params) && !$request->img) {
+            return JsonResponseHelper::error(__('messages.update_err.all_fields_is_empty'), 422);
         }
 
-        if (empty($updateDetails)) {
-            return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
-        }
-        DB::beginTransaction();
         try {
-            $trip = $this->reviewRepositoryInterface->update($updateDetails, $id);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new ReviewResource($trip), 'Review Update Successful', 201);
+            $review = $this->reviewRepositoryInterface->update($id, $params, $request->img);
+            return JsonResponseHelper::success(new ReviewResource($review), __('messages.review.updated'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.review.update_err'), 400, $ex->getMessage());
         }
     }
 
@@ -110,9 +87,13 @@ class ReviewController extends Controller
      */
     public function destroy($id)
     {
-        if ($this->reviewRepositoryInterface->delete($id)) {
-            return ResponseClass::sendResponse('Review Delete Successful', '', 201);
+        $this->authorize('delete', $this->review);
+        try {
+            $this->reviewRepositoryInterface->delete($id);
+            return JsonResponseHelper::success('', __('messages.review.deleted'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.review.missing'), 404, $ex->getMessage());
         }
-        return ResponseClass::sendResponse('Review is missing', '', 404);
     }
 }

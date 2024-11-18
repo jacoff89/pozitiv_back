@@ -8,9 +8,9 @@ interface ReviewRepositoryInterface
 
     public function getById($id);
 
-    public function store(array $data);
+    public function store(array $data, $image);
 
-    public function update(array $data, $id);
+    public function update($id, array $data, $image);
 
     public function delete($id);
 }

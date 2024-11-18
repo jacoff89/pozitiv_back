@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Interfaces\TripRepositoryInterface;
-use App\Classes\ApiResponseClass as ResponseClass;
+use App\Helpers\JsonResponseHelper as ResponseClass;
 use App\Http\Resources\TripResource;
 use Illuminate\Support\Facades\DB;
 

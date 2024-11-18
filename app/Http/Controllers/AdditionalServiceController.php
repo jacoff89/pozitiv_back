@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ApiResponseClass as ResponseClass;
+use App\Helpers\JsonResponseHelper as ResponseClass;
 use App\Http\Requests\StoreAdditionalServiceRequest;
 use App\Http\Requests\UpdateAdditionalServiceRequest;
 use App\Http\Resources\AdditionalServiceResource;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ApiResponseClass as ResponseClass;
+use App\Helpers\JsonResponseHelper as ResponseClass;
 use App\Http\Requests\StoreTourRequest;
 use App\Http\Requests\UpdateTourRequest;
 use App\Http\Resources\TourResource;
