@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonResponseHelper;
 use App\Http\Filters\ReviewFilter;
-use App\Http\Requests\StoreReviewRequest;
-use App\Http\Requests\UpdateReviewRequest;
+use App\Http\Requests\Review\StoreReviewRequest;
+use App\Http\Requests\Review\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Interfaces\ReviewRepositoryInterface;
 use App\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Helpers\JsonResponseHelper;
 
 class ReviewController extends Controller
 {
@@ -39,7 +39,6 @@ class ReviewController extends Controller
      */
     public function store(StoreReviewRequest $request)
     {
-        $this->authorize('create', Review::class);
         $params = $request->only('name', 'text', 'link');
 
         try {
@@ -66,7 +65,6 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, $id)
     {
-        $this->authorize('update', $this->review);
         $params = $request->only('name', 'text', 'link');
 
         if (empty($params) && !$request->img) {
@@ -74,7 +72,7 @@ class ReviewController extends Controller
         }
 
         try {
-            $review = $this->reviewRepositoryInterface->update($id, $params, $request->img);
+            $review = $this->reviewRepositoryInterface->update((int)$id, $params, $request->img);
             return JsonResponseHelper::success(new ReviewResource($review), __('messages.review.updated'), 201);
 
         } catch (\Exception $ex) {
@@ -89,7 +87,7 @@ class ReviewController extends Controller
     {
         $this->authorize('delete', $this->review);
         try {
-            $this->reviewRepositoryInterface->delete($id);
+            $this->reviewRepositoryInterface->delete((int)$id);
             return JsonResponseHelper::success('', __('messages.review.deleted'), 201);
 
         } catch (\Exception $ex) {

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTripRequest;
-use App\Http\Requests\UpdateTripRequest;
-use App\Interfaces\TripRepositoryInterface;
 use App\Helpers\JsonResponseHelper as ResponseClass;
+use App\Http\Requests\Trip\StoreTripRequest;
+use App\Http\Requests\Trip\UpdateTripRequest;
 use App\Http\Resources\TripResource;
+use App\Interfaces\TripRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
 class TripController extends Controller

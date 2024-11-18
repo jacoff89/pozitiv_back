@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponseHelper as ResponseClass;
-use App\Http\Requests\StoreAdditionalServiceRequest;
-use App\Http\Requests\UpdateAdditionalServiceRequest;
+use App\Http\Requests\AdditionalService\StoreAdditionalServiceRequest;
+use App\Http\Requests\AdditionalService\UpdateAdditionalServiceRequest;
 use App\Http\Resources\AdditionalServiceResource;
 use App\Interfaces\AdditionalServiceRepositoryInterface;
 use Illuminate\Support\Facades\DB;

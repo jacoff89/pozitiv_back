@@ -2,30 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonResponseHelper as ResponseClass;
-use App\Http\Requests\StoreTourRequest;
-use App\Http\Requests\UpdateTourRequest;
+use App\Helpers\JsonResponseHelper;
+use App\Http\Filters\TourFilter;
+use App\Http\Requests\Tour\StoreTourRequest;
+use App\Http\Requests\Tour\UpdateTourRequest;
 use App\Http\Resources\TourResource;
 use App\Interfaces\TourRepositoryInterface;
-use Illuminate\Support\Facades\DB;
+use App\Models\Tour;
+use Illuminate\Foundation\Http\FormRequest;
 
 class TourController extends Controller
 {
+    private Tour $tour;
     private TourRepositoryInterface $tourRepositoryInterface;
 
-    public function __construct(TourRepositoryInterface $tourRepositoryInterface)
+    public function __construct(TourRepositoryInterface $tourRepositoryInterface, Tour $tour)
     {
         $this->tourRepositoryInterface = $tourRepositoryInterface;
+        $this->tour = $tour;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(FormRequest $request, TourFilter $filter)
     {
-        $data = $this->tourRepositoryInterface->index();
+        $params = $request->only('name');
+        $data = $this->tourRepositoryInterface->index($params, $filter);
 
-        return ResponseClass::sendResponse(TourResource::collection($data), '', 200);
+        return JsonResponseHelper::success(TourResource::collection($data));
     }
 
     /**
@@ -33,31 +38,14 @@ class TourController extends Controller
      */
     public function store(StoreTourRequest $request)
     {
-        foreach ($request->images as $value) {
-            $images[] = $value->store('img/tour', 'public');
-        }
+        $params = $request->only('name', 'description', 'duration', 'place', 'plan', 'season');
 
-        $plan_picture_img = $request->plan_picture->store('img/tour_plan_picture', 'public');
-
-        $details = [
-            'name' => $request->name,
-            'description' => $request->description,
-            'duration' => $request->duration,
-            'place' => $request->place,
-            'plan' => $request->plan,
-            'plan_picture' => $plan_picture_img,
-            'season' => $request->season,
-            'images' => $images,
-        ];
-        DB::beginTransaction();
         try {
-            $trip = $this->tourRepositoryInterface->store($details);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new TourResource($trip), 'Tour Create Successful', 201);
+            $tour = $this->tourRepositoryInterface->store($params, $request->plan_picture, $request->images);
+            return JsonResponseHelper::success(new TourResource($tour), __('messages.tour.added'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.tour.add_err'), 400, $ex->getMessage());
         }
     }
 
@@ -68,7 +56,7 @@ class TourController extends Controller
     {
         $trip = $this->tourRepositoryInterface->getById($id);
 
-        return ResponseClass::sendResponse(new TourResource($trip), '', 200);
+        return JsonResponseHelper::success(new TourResource($trip));
     }
 
     /**
@@ -76,33 +64,17 @@ class TourController extends Controller
      */
     public function update(UpdateTourRequest $request, $id)
     {
-        foreach ($request->images as $value) {
-            $images[] = $value->store('img/tour', 'public');
-        }
+        $params = $request->only('name', 'description', 'duration', 'place', 'plan', 'season');
 
-        $plan_picture_img = $request->plan_picture->store('img/tour_plan_picture', 'public');
-
-        $updateDetails = [];
-        if ($request->name) $updateDetails['name'] = $request->name;
-        if ($request->description) $updateDetails['description'] = $request->description;
-        if ($request->duration) $updateDetails['duration'] = $request->duration;
-        if ($request->place) $updateDetails['place'] = $request->place;
-        if ($request->plan) $updateDetails['plan'] = $request->plan;
-        if ($request->season) $updateDetails['season'] = $request->season;
-        if ($request->images) $updateDetails['images'] = $images;
-        if ($request->plan_picture) $updateDetails['plan_picture'] = $plan_picture_img;
-        if(empty($updateDetails)) {
-            return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
+        if(empty($params) && !$request->plan_picture && !$request->images) {
+            return JsonResponseHelper::error(__('messages.update_err.all_fields_is_empty'), 422);
         }
-        DB::beginTransaction();
         try {
-            $trip = $this->tourRepositoryInterface->update($updateDetails, $id);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new TourResource($trip), 'Tour Update Successful', 201);
+            $tour = $this->tourRepositoryInterface->update((int)$id, $params, $request->plan_picture, $request->images);
+            return JsonResponseHelper::success(new TourResource($tour), __('messages.tour.updated'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.tour.update_err'), 400, $ex->getMessage());
         }
     }
 
@@ -111,9 +83,13 @@ class TourController extends Controller
      */
     public function destroy($id)
     {
-        if ($this->tourRepositoryInterface->delete($id)) {
-            return ResponseClass::sendResponse('Tour Delete Successful', '', 201);
+        $this->authorize('delete', $this->tour);
+        try {
+            $this->tourRepositoryInterface->delete((int)$id);
+            return JsonResponseHelper::success('', __('messages.tour.deleted'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.tour.missing'), 404, $ex->getMessage());
         }
-        return ResponseClass::sendResponse('Tour is missing', '', 404);
     }
 }

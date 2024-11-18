@@ -27,7 +27,7 @@ class ReviewRepository implements ReviewRepositoryInterface
             return Review::create($data);
 
         } catch (\Exception $ex) {
-            $this->deleteImage($uploadImage);
+            $this->deleteImages($uploadImage);
             return $ex;
         }
     }
@@ -45,16 +45,16 @@ class ReviewRepository implements ReviewRepositoryInterface
                 $uploadImage = $this->uploadImage($image);
                 $data = array_merge($uploadImage, $data);
                 Review::whereId($id)->update($data);
-                $this->deleteImage($oldImages);
+                $this->deleteImages($oldImages);
             } else {
                 Review::whereId($id)->update($data);
-                $this->deleteImage($oldImages);
+                $this->deleteImages($oldImages);
             }
 
             return Review::findOrFail($id);
 
         } catch (\Exception $ex) {
-            if ($image && isset($uploadImage)) $this->deleteImage($uploadImage);
+            if ($image && isset($uploadImage)) $this->deleteImages($uploadImage);
             return $ex;
         }
     }
@@ -67,7 +67,7 @@ class ReviewRepository implements ReviewRepositoryInterface
             'img_webp' => $review->img_webp,
         ];
         Review::destroy($id);
-        $this->deleteImage($images);
+        $this->deleteImages($images);
     }
 
     private function uploadImage($image): array
@@ -82,7 +82,7 @@ class ReviewRepository implements ReviewRepositoryInterface
         ];
     }
 
-    private function deleteImage(array $images): void
+    private function deleteImages(array $images): void
     {
         foreach ($images as $image) {
             if (Storage::disk('public')->exists($image)) Storage::disk('public')->delete($image);

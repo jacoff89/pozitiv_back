@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Tour;
 
 use App\Helpers\JsonResponseHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 
-class StoreTourRequest extends FormRequest
+class UpdateTourRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::user() && Auth::user()->isAdmin();
     }
 
     /**
@@ -25,13 +26,14 @@ class StoreTourRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'description' => 'required',
-            'duration' => 'required',
-            'place' => 'required',
-            'plan' => 'required',
-            'season' => 'required',
-            'images.*' => 'required|image',
+            'name' => 'nullable|string',
+            'description' => 'nullable|string',
+            'duration' => 'nullable|string',
+            'place' => 'nullable|string',
+            'plan' => 'nullable|string',
+            'season' => 'nullable|string',
+            'images.*' => 'nullable|image',
+            'images' => 'nullable|array|max:5',
         ];
     }
 
