@@ -10,8 +10,15 @@ class Tour extends Model
 {
     use HasFactory;
 
-    protected $guarded = [
-
+    protected $fillable = [
+        'name',
+        'description',
+        'duration',
+        'place',
+        'plan',
+        'plan_picture',
+        'season',
+        'images',
     ];
 
     protected $casts = [

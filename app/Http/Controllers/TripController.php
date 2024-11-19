@@ -2,31 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonResponseHelper as ResponseClass;
+use App\Helpers\JsonResponseHelper;
+use App\Http\Filters\TripFilter;
 use App\Http\Requests\Trip\StoreTripRequest;
 use App\Http\Requests\Trip\UpdateTripRequest;
 use App\Http\Resources\TripResource;
 use App\Interfaces\TripRepositoryInterface;
-use Illuminate\Support\Facades\DB;
+use App\Models\Trip;
+use Illuminate\Foundation\Http\FormRequest;
 
 class TripController extends Controller
 {
+    private Trip $trip;
 
     private TripRepositoryInterface $tripRepositoryInterface;
 
-    public function __construct(TripRepositoryInterface $tripRepositoryInterface)
+    public function __construct(TripRepositoryInterface $tripRepositoryInterface, Trip $trip)
     {
         $this->tripRepositoryInterface = $tripRepositoryInterface;
+        $this->trip = $trip;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(FormRequest $request, TripFilter $filter, $tour_id = null)
     {
-        $data = $this->tripRepositoryInterface->index();
+        $params = $request->only('tour_id');
+        if ($tour_id && !is_numeric($tour_id)) abort(404);
+        $params['tour_id'] = (int)$tour_id;
+        $data = $this->tripRepositoryInterface->index($params, $filter);
 
-        return ResponseClass::sendResponse(TripResource::collection($data));
+        return JsonResponseHelper::success(TripResource::collection($data));
     }
 
     /**
@@ -34,24 +41,13 @@ class TripController extends Controller
      */
     public function store(StoreTripRequest $request)
     {
-        $details = [
-            'cost' => $request->cost,
-            'min_cost' => $request->min_cost,
-            'date_start' => $request->date_start,
-            'date_end' => $request->date_end,
-            'tourist_limit' => $request->tourist_limit,
-            'bonuses' => $request->bonuses,
-            'tour_id' => $request->tour_id,
-        ];
-        DB::beginTransaction();
+        $params = $request->only('cost', 'min_cost', 'date_start', 'date_end', 'tourist_limit', 'bonuses', 'tour_id');
         try {
-            $trip = $this->tripRepositoryInterface->store($details);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new TripResource($trip), 'Trip Create Successful', 201);
+            $trip = $this->tripRepositoryInterface->store($params);
+            return JsonResponseHelper::success(new TripResource($trip), __('messages.trip.added'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.tour.add_err'), 400, $ex->getMessage());
         }
     }
 
@@ -62,7 +58,7 @@ class TripController extends Controller
     {
         $trip = $this->tripRepositoryInterface->getById($id);
 
-        return ResponseClass::sendResponse(new TripResource($trip));
+        return JsonResponseHelper::success(new TripResource($trip));
     }
 
     /**
@@ -70,26 +66,16 @@ class TripController extends Controller
      */
     public function update(UpdateTripRequest $request, $id)
     {
-        $updateDetails = [];
-        if ($request->cost) $updateDetails['cost'] = $request->cost;
-        if ($request->min_cost) $updateDetails['min_cost'] = $request->min_cost;
-        if ($request->date_start) $updateDetails['date_start'] = $request->date_start;
-        if ($request->date_end) $updateDetails['date_end'] = $request->date_end;
-        if ($request->tourist_limit) $updateDetails['tourist_limit'] = $request->tourist_limit;
-        if ($request->bonuses) $updateDetails['bonuses'] = $request->bonuses;
-        if ($request->tour_id) $updateDetails['tour_id'] = $request->tour_id;
-        if(empty($updateDetails)) {
-            return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
+        $params = $request->only('cost', 'min_cost', 'date_start', 'date_end', 'tourist_limit', 'bonuses', 'tour_id');
+        if(empty($params)) {
+            return JsonResponseHelper::error(__('messages.update_err.all_fields_is_empty'), 422);
         }
-        DB::beginTransaction();
         try {
-            $trip = $this->tripRepositoryInterface->update($updateDetails, $id);
-
-            DB::commit();
-            return ResponseClass::sendResponse(new TripResource($trip), 'Trip Update Successful', 201);
+            $trip = $this->tripRepositoryInterface->update((int)$id, $params);
+            return JsonResponseHelper::success(new TripResource($trip), __('messages.trip.updated'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.trip.update_err'), 400, $ex->getMessage());
         }
     }
 
@@ -98,9 +84,13 @@ class TripController extends Controller
      */
     public function destroy($id)
     {
-        if ($this->tripRepositoryInterface->delete($id)) {
-            return ResponseClass::sendResponse('Trip Delete Successful', '', 201);
+        $this->authorize('delete', $this->trip);
+        try {
+            $this->tripRepositoryInterface->delete((int)$id);
+            return JsonResponseHelper::success('', __('messages.trip.deleted'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.trip.missing'), 404, $ex->getMessage());
         }
-        return ResponseClass::sendResponse('Trip is missing', '', 404);
     }
 }

@@ -7,9 +7,9 @@ use App\Interfaces\TripRepositoryInterface;
 
 class TripRepository implements TripRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter)
     {
-        return Trip::all();
+        return $filter->apply(Trip::with('additionalServices'), $queryParams)->get();
     }
 
     public function getById($id)
@@ -22,7 +22,7 @@ class TripRepository implements TripRepositoryInterface
         return Trip::create($data);
     }
 
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
         Trip::whereId($id)->update($data);
         return Trip::findOrFail($id);

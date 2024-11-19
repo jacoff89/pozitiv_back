@@ -12,8 +12,14 @@ class Trip extends Model
 {
     use HasFactory;
 
-    protected $guarded = [
-
+    protected $fillable = [
+        'cost',
+        'min_cost',
+        'date_start',
+        'date_end',
+        'tourist_limit',
+        'bonuses',
+        'tour_id',
     ];
 
     protected $casts = [

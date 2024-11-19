@@ -26,5 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('reviews',ReviewController::class);
     Route::apiResource('additional_service',AdditionalServiceController::class);
 
+    Route::apiResource('tours/{tour_id}/trips', TripController::class);
+
     Route::get('wp-json/tour/get', [ApiController::class, 'tours'])->name('tours');
 });

@@ -54,9 +54,9 @@ class TourController extends Controller
      */
     public function show($id)
     {
-        $trip = $this->tourRepositoryInterface->getById($id);
+        $tour = $this->tourRepositoryInterface->getById($id);
 
-        return JsonResponseHelper::success(new TourResource($trip));
+        return JsonResponseHelper::success(new TourResource($tour));
     }
 
     /**

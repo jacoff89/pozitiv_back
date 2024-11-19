@@ -21,9 +21,8 @@ class TripResource extends JsonResource
             'date_start' => $this->date_start,
             'date_end' => $this->date_end,
             'tourist_limit' => $this->tourist_limit,
-            'additional_services' => $this->additional_services,
+            'additional_services' => $this->additionalServices,
             'bonuses' => $this->bonuses,
-            'tour' => $this->tour,
             'orders' => $this->orders,
         ];
     }

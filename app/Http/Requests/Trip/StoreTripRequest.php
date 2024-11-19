@@ -6,6 +6,7 @@ use App\Helpers\JsonResponseHelper;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 
 class StoreTripRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class StoreTripRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::user() && Auth::user()->isAdmin();
     }
 
     /**
@@ -25,12 +26,13 @@ class StoreTripRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cost' => 'required',
-            'min_cost' => 'required',
-            'date_start' => 'required',
-            'date_end' => 'required',
-            'tourist_limit' => 'required',
-            'tour_id' => 'required',
+            'cost' => 'required|integer',
+            'min_cost' => 'required|integer',
+            'date_start' => 'required|date',
+            'date_end' => 'required|date',
+            'tourist_limit' => 'required|integer',
+            'bonuses' => 'required|integer',
+            'tour_id' => 'required|integer',
         ];
     }
 
