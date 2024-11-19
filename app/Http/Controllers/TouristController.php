@@ -91,7 +91,7 @@ class TouristController extends Controller
         }
         try {
             if (!Auth::user()->isAdmin()) unset($params['user_id']);
-            $data = $this->touristRepositoryInterface->update($params, $id);
+            $data = $this->touristRepositoryInterface->update($id, $params);
             return JsonResponseHelper::success(new TouristResource($data), __('messages.tourist.updated'), 201);
 
         } catch (\Exception $ex) {

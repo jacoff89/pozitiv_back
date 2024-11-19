@@ -22,7 +22,7 @@ class AdditionalServiceRepository implements AdditionalServiceRepositoryInterfac
         return AdditionalService::create($data);
     }
 
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
         AdditionalService::whereId($id)->update($data);
         return AdditionalService::findOrFail($id);

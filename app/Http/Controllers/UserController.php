@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponseHelper;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Resources\UserResource;
+use App\Interfaces\TouristRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\Tourist;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,17 +17,28 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    private TouristRepositoryInterface $touristRepositoryInterface;
+
+    private UserRepositoryInterface $userRepositoryInterface;
+
+    public function __construct(UserRepositoryInterface $userRepositoryInterface, TouristRepositoryInterface $touristRepositoryInterface)
+    {
+        $this->userRepositoryInterface = $userRepositoryInterface;
+        $this->touristRepositoryInterface = $touristRepositoryInterface;
+    }
+
     public function getCurrent()
     {
         if (!Auth::user()) abort(401);
-        dd(User::whereId(Auth::id())->with('mainTourist')->first()->toArray());
+        $user = $this->userRepositoryInterface->getById(Auth::id());
+        return JsonResponseHelper::success(new UserResource($user));
     }
 
     public function getAll()
     {
         if (!Auth::user()->isAdmin()) abort(401);
-        $users = User::all();
-        return JsonResponseHelper::success($users->toArray());
+        $users = $this->userRepositoryInterface->index();
+        return JsonResponseHelper::success(UserResource::collection($users));
     }
 
     public function register(StoreUserRequest $request)
@@ -36,11 +50,11 @@ class UserController extends Controller
 
         DB::beginTransaction();
         try {
-            $user = User::create($userParams);
+            $user = $this->userRepositoryInterface->store($userParams);
             $touristParams['user_id'] = $user->id;
 
-            $tourist = Tourist::create($touristParams);
-            User::whereId($user->id)->update(['main_tourist_id' => $tourist->id]);
+            $tourist = $this->touristRepositoryInterface->store($touristParams);
+            $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $tourist->id]);
             DB::commit();
 
             return JsonResponseHelper::success(['token' => $user->createToken("WEB APP")->plainTextToken], __('messages.user.added'), 201);

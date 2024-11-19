@@ -22,7 +22,7 @@ class OrderRepository implements OrderRepositoryInterface
         return Order::create($data);
     }
 
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
         Order::whereId($id)->update($data);
         return Order::findOrFail($id);

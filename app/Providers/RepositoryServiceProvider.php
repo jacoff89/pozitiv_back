@@ -9,6 +9,7 @@ use App\Interfaces\ReviewRepositoryInterface;
 use App\Interfaces\TourRepositoryInterface;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\TripRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\AdditionalServiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
@@ -16,6 +17,7 @@ use App\Repositories\ReviewRepository;
 use App\Repositories\TourRepository;
 use App\Repositories\TouristRepository;
 use App\Repositories\TripRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -32,6 +34,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AdditionalServiceRepositoryInterface::class, AdditionalServiceRepository::class);
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 
     /**

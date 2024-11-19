@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PaymentRepositoryInterface
+interface UserRepositoryInterface
 {
     public function index();
 
@@ -11,6 +11,4 @@ interface PaymentRepositoryInterface
     public function store(array $data);
 
     public function update($id, array $data);
-
-    public function delete($id);
 }

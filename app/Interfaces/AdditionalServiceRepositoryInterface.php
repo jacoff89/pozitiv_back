@@ -10,7 +10,7 @@ interface AdditionalServiceRepositoryInterface
 
     public function store(array $data);
 
-    public function update(array $data, $id);
+    public function update($id, array $data);
 
     public function delete($id);
 }

@@ -22,7 +22,7 @@ class PaymentRepository implements PaymentRepositoryInterface
         return Payment::create($data);
     }
 
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
         Payment::whereId($id)->update($data);
         return Payment::findOrFail($id);

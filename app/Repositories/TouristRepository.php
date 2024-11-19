@@ -22,7 +22,7 @@ class TouristRepository implements TouristRepositoryInterface
         return Tourist::create($data);
     }
 
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
         Tourist::whereId($id)->update($data);
         return Tourist::findOrFail($id);
