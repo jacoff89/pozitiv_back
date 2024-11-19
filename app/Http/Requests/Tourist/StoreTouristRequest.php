@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Tourist;
 
-use App\Helpers\JsonResponseHelper;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreTouristRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -25,15 +25,10 @@ class StoreTouristRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'phone' => 'required',
-            'user_id' => 'required',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'phone' => 'required|string',
+            'user_id' => 'nullable|integer',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(JsonResponseHelper::validationError($validator->errors()));
     }
 }

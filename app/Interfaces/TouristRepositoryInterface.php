@@ -4,7 +4,7 @@ namespace App\Interfaces;
 
 interface TouristRepositoryInterface
 {
-    public function index();
+    public function index(array $queryParams, $filter);
 
     public function getById($id);
 

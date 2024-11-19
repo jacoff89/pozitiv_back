@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Review;
 
-use App\Helpers\JsonResponseHelper;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class UpdateReviewRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -31,10 +31,5 @@ class UpdateReviewRequest extends FormRequest
             'link' => 'nullable|string|max:255',
             'img' => 'nullable|image'
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(JsonResponseHelper::validationError($validator->errors()));
     }
 }

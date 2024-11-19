@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Models\Review;
 use App\Models\Tour;
+use App\Models\Tourist;
 use App\Models\Trip;
 use App\Policies\ReviewPolicy;
+use App\Policies\TouristPolicy;
 use App\Policies\TourPolicy;
 use App\Policies\TripPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -16,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
         Review::class => ReviewPolicy::class,
         Tour::class => TourPolicy::class,
         Trip::class => TripPolicy::class,
+        Tourist::class => TouristPolicy::class,
     ];
 
     public function register(): void

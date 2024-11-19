@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Tour;
 
-use App\Helpers\JsonResponseHelper;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class StoreTourRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -35,10 +35,5 @@ class StoreTourRequest extends FormRequest
             'images.*' => 'required|image',
             'images' => 'required|array|max:5',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(JsonResponseHelper::validationError($validator->errors()));
     }
 }

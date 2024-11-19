@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Tourist;
 
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTouristRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,7 +25,10 @@ class UpdateTouristRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'user_id' => 'nullable|integer',
         ];
     }
 }

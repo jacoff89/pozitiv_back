@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Review;
 
-use App\Helpers\JsonResponseHelper;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class StoreReviewRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -31,9 +31,5 @@ class StoreReviewRequest extends FormRequest
             'link' => 'required|string|max:255',
             'img' => 'required|image'
         ];
-    }
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(JsonResponseHelper::validationError($validator->errors()));
     }
 }

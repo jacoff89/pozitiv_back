@@ -30,7 +30,7 @@ class TripController extends Controller
     {
         $params = $request->only('tour_id');
         if ($tour_id && !is_numeric($tour_id)) abort(404);
-        $params['tour_id'] = (int)$tour_id;
+        if ($tour_id) $params['tour_id'] = (int)$tour_id;
         $data = $this->tripRepositoryInterface->index($params, $filter);
 
         return JsonResponseHelper::success(TripResource::collection($data));
@@ -39,9 +39,15 @@ class TripController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTripRequest $request)
+    public function store(StoreTripRequest $request, $tour_id = null)
     {
         $params = $request->only('cost', 'min_cost', 'date_start', 'date_end', 'tourist_limit', 'bonuses', 'tour_id');
+        if ($tour_id ) {
+            if (!is_numeric($tour_id)) abort(404);
+            $params['tour_id'] = (int)$tour_id;
+        } elseif (!isset($params['tour_id']) || !is_numeric($params['tour_id'])) {
+            return JsonResponseHelper::validationError('Поле tour_id обязательно для заполнения');
+        }
         try {
             $trip = $this->tripRepositoryInterface->store($params);
             return JsonResponseHelper::success(new TripResource($trip), __('messages.trip.added'), 201);

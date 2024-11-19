@@ -2,53 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonResponseHelper as ResponseClass;
+use App\Helpers\JsonResponseHelper;
+use App\Http\Filters\TouristFilter;
 use App\Http\Requests\Tourist\StoreTouristRequest;
 use App\Http\Requests\Tourist\UpdateTouristRequest;
 use App\Http\Resources\TouristResource;
 use App\Interfaces\TouristRepositoryInterface;
-use Illuminate\Support\Facades\DB;
+use App\Models\Tourist;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class TouristController extends Controller
 {
+    private Tourist $tourist;
 
     private TouristRepositoryInterface $touristRepositoryInterface;
 
-    public function __construct(TouristRepositoryInterface $touristRepositoryInterface)
+    public function __construct(TouristRepositoryInterface $touristRepositoryInterface, Tourist $tourist)
     {
         $this->touristRepositoryInterface = $touristRepositoryInterface;
+        $this->tourist = $tourist;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(FormRequest $request, TouristFilter $filter, $user_id = null)
     {
-        $data = $this->touristRepositoryInterface->index();
+        $this->authorize('viewAny', $this->tourist);
+        $params = $request->only('user_id');
+        if ($user_id && !is_numeric($user_id)) abort(404);
+        if ($user_id) $params['user_id'] = (int)$user_id;
 
-        return ResponseClass::sendResponse(TouristResource::collection($data));
+        if (!Auth::user()->isAdmin()) $params['user_id'] = Auth::user()->id;
+
+        $data = $this->touristRepositoryInterface->index($params, $filter);
+
+        return JsonResponseHelper::success(TouristResource::collection($data));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTouristRequest $request)
+    public function store(StoreTouristRequest $request, $user_id = null)
     {
-        $details = [
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'phone' => $request->phone,
-            'user_id' => $request->user_id,
-        ];
-        DB::beginTransaction();
-        try {
-            $trip = $this->touristRepositoryInterface->store($details);
+        $this->authorize('create', $this->tourist);
+        $params = $request->only('first_name', 'last_name', 'phone', 'user_id');
+        if ($user_id) {
+            if (!is_numeric($user_id)) abort(404);
+            $params['user_id'] = (int)$user_id;
+        } elseif (!Auth::user()->isAdmin()) {
+            $params['user_id'] = Auth::user()->id;
+        } elseif (!isset($params['user_id']) || !is_numeric($params['user_id'])) {
+            return JsonResponseHelper::validationError('Поле user_id обязательно для заполнения');
+        }
 
-            DB::commit();
-            return ResponseClass::sendResponse(new TouristResource($trip), 'Tourist Create Successful', 201);
+        try {
+            $tourist = $this->touristRepositoryInterface->store($params);
+            return JsonResponseHelper::success(new TouristResource($tourist), __('messages.tourist.added'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.tourist.add_err'), 400, $ex->getMessage());
         }
     }
 
@@ -57,9 +71,10 @@ class TouristController extends Controller
      */
     public function show($id)
     {
-        $trip = $this->touristRepositoryInterface->getById($id);
+        $tourist = $this->touristRepositoryInterface->getById($id);
+        $this->authorize('view', $tourist);
 
-        return ResponseClass::sendResponse(new TouristResource($trip));
+        return JsonResponseHelper::success(new TouristResource($tourist));
     }
 
     /**
@@ -67,23 +82,20 @@ class TouristController extends Controller
      */
     public function update(UpdateTouristRequest $request, $id)
     {
-        $updateDetails = [];
-        if ($request->first_name) $updateDetails['first_name'] = $request->first_name;
-        if ($request->last_name) $updateDetails['last_name'] = $request->last_name;
-        if ($request->phone) $updateDetails['phone'] = $request->phone;
-        if ($request->user_id) $updateDetails['user_id'] = $request->user_id;
-        if(empty($updateDetails)) {
-            return ResponseClass::sendResponse('', 'Update Failed (all fields is empty)', 400);
-        }
-        DB::beginTransaction();
-        try {
-            $trip = $this->touristRepositoryInterface->update($updateDetails, $id);
+        $tourist = $this->touristRepositoryInterface->getById($id);
+        $this->authorize('update', $tourist);
 
-            DB::commit();
-            return ResponseClass::sendResponse(new TouristResource($trip), 'Tourist Update Successful', 201);
+        $params = $request->only('first_name', 'last_name', 'phone', 'user_id');
+        if(empty($params)) {
+            return JsonResponseHelper::error(__('messages.update_err.all_fields_is_empty'), 422);
+        }
+        try {
+            if (!Auth::user()->isAdmin()) unset($params['user_id']);
+            $data = $this->touristRepositoryInterface->update($params, $id);
+            return JsonResponseHelper::success(new TouristResource($data), __('messages.tourist.updated'), 201);
 
         } catch (\Exception $ex) {
-            return ResponseClass::rollback($ex);
+            return JsonResponseHelper::error(__('messages.tourist.update_err'), 400, $ex->getMessage());
         }
     }
 
@@ -92,9 +104,14 @@ class TouristController extends Controller
      */
     public function destroy($id)
     {
-        if ($this->touristRepositoryInterface->delete($id)) {
-            return ResponseClass::sendResponse('Tourist Delete Successful', '', 201);
+        $tourist = $this->touristRepositoryInterface->getById($id);
+        $this->authorize('delete', $tourist);
+        try {
+            $this->touristRepositoryInterface->delete((int)$id);
+            return JsonResponseHelper::success('', __('messages.tourist.deleted'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.tourist.missing'), 404, $ex->getMessage());
         }
-        return ResponseClass::sendResponse('Tourist is missing', '', 404);
     }
 }

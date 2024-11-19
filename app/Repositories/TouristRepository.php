@@ -7,9 +7,9 @@ use App\Interfaces\TouristRepositoryInterface;
 
 class TouristRepository implements TouristRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter)
     {
-        return Tourist::all();
+        return $filter->apply(Tourist::query(), $queryParams)->get();
     }
 
     public function getById($id)

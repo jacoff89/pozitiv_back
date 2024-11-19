@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateOrderRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */

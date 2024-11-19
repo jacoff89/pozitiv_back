@@ -13,7 +13,7 @@ class TouristPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class TouristPolicy
      */
     public function view(User $user, Tourist $tourist): bool
     {
-        //
+        return $user->isAdmin() || $tourist->user_id === $user->id;
     }
 
     /**
@@ -29,7 +29,7 @@ class TouristPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class TouristPolicy
      */
     public function update(User $user, Tourist $tourist): bool
     {
-        //
+        return $user->isAdmin() || $tourist->user_id === $user->id;
     }
 
     /**
@@ -45,22 +45,6 @@ class TouristPolicy
      */
     public function delete(User $user, Tourist $tourist): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Tourist $tourist): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Tourist $tourist): bool
-    {
-        //
+        return $user->isAdmin() || $tourist->user_id === $user->id;
     }
 }

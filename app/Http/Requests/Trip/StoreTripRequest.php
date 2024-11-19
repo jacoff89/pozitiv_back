@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Trip;
 
-use App\Helpers\JsonResponseHelper;
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class StoreTripRequest extends FormRequest
 {
+    use Validation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -32,12 +32,7 @@ class StoreTripRequest extends FormRequest
             'date_end' => 'required|date',
             'tourist_limit' => 'required|integer',
             'bonuses' => 'required|integer',
-            'tour_id' => 'required|integer',
+            'tour_id' => 'nullable|integer',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(JsonResponseHelper::validationError($validator->errors()));
     }
 }
