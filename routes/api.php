@@ -4,16 +4,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\TourController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\TouristController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdditionalServiceController;
 
 
 Route::prefix('v1')->group(function () {
-    Route::get('user', function () {
-        return Auth::user();
-    })->middleware('auth');
+
+    Route::get('user', [UserController::class, 'getCurrent']);
+    Route::get('users', [UserController::class, 'getAll']);
 
     Route::post('register', [UserController::class, 'register'])->name('register');
     Route::post('login', [UserController::class, 'login'])->name('login');

@@ -10,8 +10,16 @@ class Tourist extends Model
 {
     use HasFactory;
 
-    protected $guarded = [
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'phone',
+        'user_id',
+    ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     /**

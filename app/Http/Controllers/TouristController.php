@@ -34,7 +34,7 @@ class TouristController extends Controller
         if ($user_id && !is_numeric($user_id)) abort(404);
         if ($user_id) $params['user_id'] = (int)$user_id;
 
-        if (!Auth::user()->isAdmin()) $params['user_id'] = Auth::user()->id;
+        if (!Auth::user()->isAdmin()) $params['user_id'] = Auth::id();
 
         $data = $this->touristRepositoryInterface->index($params, $filter);
 
@@ -52,7 +52,7 @@ class TouristController extends Controller
             if (!is_numeric($user_id)) abort(404);
             $params['user_id'] = (int)$user_id;
         } elseif (!Auth::user()->isAdmin()) {
-            $params['user_id'] = Auth::user()->id;
+            $params['user_id'] = Auth::id();
         } elseif (!isset($params['user_id']) || !is_numeric($params['user_id'])) {
             return JsonResponseHelper::validationError('Поле user_id обязательно для заполнения');
         }
