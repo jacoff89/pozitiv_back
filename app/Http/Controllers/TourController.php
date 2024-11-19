@@ -9,10 +9,13 @@ use App\Http\Requests\Tour\UpdateTourRequest;
 use App\Http\Resources\TourResource;
 use App\Interfaces\TourRepositoryInterface;
 use App\Models\Tour;
+use App\Traits\OldToursTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TourController extends Controller
 {
+    use OldToursTrait;
+
     private Tour $tour;
     private TourRepositoryInterface $tourRepositoryInterface;
 

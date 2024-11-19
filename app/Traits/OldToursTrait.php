@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Traits;
 
-class ApiController extends Controller
+trait OldToursTrait
 {
-    public function tours()
+    public function getOldTours()
     {
-        $tours = [
+        return [
             [
                 'description' => "Однодневный выезд в ЦАО ЕВРАЗИЯ  СТОИМОСТЬ поездки: 1800 руб. - большой склон 2000 руб. - программа НОВИЧОК 1200 руб. - учебный склон  В стоимость включено: - трансфер Челябинск-Евразия-Челябинск; - скипасс 5 часов; - веселая компания; - отличное настроение.  Программа НОВИЧОК. Включено: - трансфер; - скипасс 5 часов на учебный склон; - прокат снаряжения; - инструктор 2 часа.",
                 'duration' => "1 день",
@@ -205,6 +205,5 @@ class ApiController extends Controller
                 'video' => false
             ],
         ];
-        return response()->json(['tours' => $tours]);
     }
 }

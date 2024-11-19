@@ -24,7 +24,7 @@ class JsonResponseHelper
             'message' => $message,
         ];
 
-        if ($message) $responseArr['errors'] = $errors;
+        if ($errors) $responseArr['errors'] = $errors;
         return response()->json($responseArr, $statusCode);
     }
 
