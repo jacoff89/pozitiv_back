@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TouristController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AdditionalServiceController;
+use App\Http\Controllers\OrderController;
 
 
 Route::prefix('v1')->group(function () {
@@ -25,6 +26,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('additional_service',AdditionalServiceController::class);
 
     Route::apiResource('tours/{tour_id}/trips', TripController::class);
+
+    Route::apiResource('orders', OrderController::class);
 
     Route::get('wp-json/tour/get', [TourController::class, 'getOldTours'])->name('oldTours');
 });

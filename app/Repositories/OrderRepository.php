@@ -7,14 +7,14 @@ use App\Models\Order;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter)
     {
-        return Order::all();
+        return $filter->apply(Order::with('additionalServices', 'tourists', 'user', 'trip'), $queryParams)->get();
     }
 
     public function getById($id)
     {
-        return Order::findOrFail($id);
+        return Order::with('additionalServices', 'tourists', 'user', 'trip')->findOrFail($id);
     }
 
     public function store(array $data)

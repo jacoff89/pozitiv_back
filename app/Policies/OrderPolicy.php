@@ -13,7 +13,7 @@ class OrderPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        //
+        return $user->isAdmin() || $order->user_id === $user->id;
     }
 
     /**
@@ -44,22 +44,6 @@ class OrderPolicy
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Order $order): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Order $order): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Order $order): bool
     {
         //
     }
