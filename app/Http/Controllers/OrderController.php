@@ -47,7 +47,9 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
-        //
+        $params = $request->only('user_id', 'trip_id', 'comment', 'additional_services', 'tourists');
+
+        $order = $this->orderService->createOrder($params);
     }
 
     /**

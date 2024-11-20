@@ -31,7 +31,7 @@ class TripController extends Controller
         $params = $request->only('tour_id');
         if ($tour_id && !is_numeric($tour_id)) abort(404);
         if ($tour_id) $params['tour_id'] = (int)$tour_id;
-        $data = $this->tripRepositoryInterface->index($params, $filter);
+        $data = $this->tripRepositoryInterface->index($params, $filter, ['additionalServices']);
 
         return JsonResponseHelper::success(TripResource::collection($data));
     }
@@ -63,7 +63,7 @@ class TripController extends Controller
      */
     public function show($id)
     {
-        $trip = $this->tripRepositoryInterface->getById($id);
+        $trip = $this->tripRepositoryInterface->getById($id, ['additionalServices']);
 
         return JsonResponseHelper::success(new TripResource($trip));
     }

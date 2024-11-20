@@ -7,14 +7,26 @@ use App\Interfaces\TripRepositoryInterface;
 
 class TripRepository implements TripRepositoryInterface
 {
-    public function index(array $queryParams, $filter)
+    public function index(array $queryParams, $filter, array|null $relations = null)
     {
-        return $filter->apply(Trip::with('additionalServices'), $queryParams)->get();
+        $trip = Trip::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $trip->with($relation);
+            }
+        }
+        return $filter->apply($trip, $queryParams)->get();
     }
 
-    public function getById($id)
+    public function getById($id, array|null $relations = null)
     {
-        return Trip::findOrFail($id);
+        $trip = Trip::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $trip->with($relation);
+            }
+        }
+        return $trip->findOrFail($id);
     }
 
     public function store(array $data)

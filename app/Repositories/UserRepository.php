@@ -7,14 +7,26 @@ use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter, array|null $relations = null)
     {
-        return User::with('mainTourist')->get();
+        $users = User::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $users->with($relation);
+            }
+        }
+        return $filter->apply($users, $queryParams)->get();
     }
 
-    public function getById($id)
+    public function getById($id, array|null $relations = null)
     {
-        return User::findOrFail($id);
+        $user = User::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $user->with($relation);
+            }
+        }
+        return $user->findOrFail($id);
     }
 
     public function store(array $data)

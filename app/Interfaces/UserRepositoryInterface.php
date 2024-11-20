@@ -4,9 +4,9 @@ namespace App\Interfaces;
 
 interface UserRepositoryInterface
 {
-    public function index();
+    public function index(array $queryParams, $filter, array|null $relations = null);
 
-    public function getById($id);
+    public function getById($id, array|null $relations = null);
 
     public function store(array $data);
 

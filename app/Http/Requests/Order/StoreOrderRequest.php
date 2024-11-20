@@ -25,7 +25,15 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'required|integer',
+            'trip_id' => 'required|integer',
+            'comment' => 'required|string',
+            'additional_services' => 'required|array',
+            'additional_services.*' => 'required|array',
+            'additional_services.*.id' => 'required|integer',
+            'additional_services.*.count' => 'required|integer',
+            'tourists' => 'required|array',
+            'tourists.*' => 'required|integer',
         ];
     }
 }

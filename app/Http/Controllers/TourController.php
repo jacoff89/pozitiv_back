@@ -31,7 +31,7 @@ class TourController extends Controller
     public function index(FormRequest $request, TourFilter $filter)
     {
         $params = $request->only('name');
-        $data = $this->tourRepositoryInterface->index($params, $filter);
+        $data = $this->tourRepositoryInterface->index($params, $filter, ['trips']);
 
         return JsonResponseHelper::success(TourResource::collection($data));
     }
@@ -58,7 +58,7 @@ class TourController extends Controller
      */
     public function show($id)
     {
-        $tour = $this->tourRepositoryInterface->getById($id);
+        $tour = $this->tourRepositoryInterface->getById($id, ['trips']);
 
         return JsonResponseHelper::success(new TourResource($tour));
     }

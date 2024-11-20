@@ -8,14 +8,26 @@ use Illuminate\Support\Facades\Storage;
 
 class TourRepository implements TourRepositoryInterface
 {
-    public function index(array $queryParams, $filter)
+    public function index(array $queryParams, $filter, array|null $relations = null)
     {
-        return $filter->apply(Tour::with('trips'), $queryParams)->get();
+        $tour = Tour::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $tour->with($relation);
+            }
+        }
+        return $filter->apply($tour, $queryParams)->get();
     }
 
-    public function getById($id)
+    public function getById($id, array|null $relations = null)
     {
-        return Tour::findOrFail($id);
+        $tour = Tour::query();
+        if ($relations) {
+            foreach ($relations as $relation) {
+                $tour->with($relation);
+            }
+        }
+        return $tour->findOrFail($id);
     }
 
     public function store(array $data, $planPicture, $images)

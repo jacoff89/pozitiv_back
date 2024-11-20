@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JsonResponseHelper;
+use App\Http\Filters\UserFilter;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,10 +35,12 @@ class UserController extends Controller
         return JsonResponseHelper::success(new UserResource($user));
     }
 
-    public function getAll()
+    public function getAll(FormRequest $request, UserFilter $filter)
     {
+        $params = $request->only('email');
         if (!Auth::user()->isAdmin()) abort(401);
-        $users = $this->userRepositoryInterface->index();
+        $users = $this->userRepositoryInterface->index($params, $filter);
+        
         return JsonResponseHelper::success(UserResource::collection($users));
     }
 
