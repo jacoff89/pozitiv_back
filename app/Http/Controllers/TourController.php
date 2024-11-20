@@ -41,6 +41,7 @@ class TourController extends Controller
      */
     public function store(StoreTourRequest $request)
     {
+        $this->authorize('create', $this->tour);
         $params = $request->only('name', 'description', 'duration', 'place', 'plan', 'season');
 
         try {
@@ -67,6 +68,7 @@ class TourController extends Controller
      */
     public function update(UpdateTourRequest $request, $id)
     {
+        $this->authorize('update', $this->tour);
         $params = $request->only('name', 'description', 'duration', 'place', 'plan', 'season');
 
         if(empty($params) && !$request->plan_picture && !$request->images) {

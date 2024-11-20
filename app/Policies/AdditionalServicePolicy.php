@@ -13,7 +13,7 @@ class AdditionalServicePolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->isAdmin();
     }
 
     /**
@@ -21,7 +21,7 @@ class AdditionalServicePolicy
      */
     public function view(User $user, AdditionalService $additionalService): bool
     {
-        //
+        return $user->isAdmin();
     }
 
     /**
@@ -29,7 +29,7 @@ class AdditionalServicePolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->isAdmin();
     }
 
     /**
@@ -37,7 +37,7 @@ class AdditionalServicePolicy
      */
     public function update(User $user, AdditionalService $additionalService): bool
     {
-        //
+        return $user->isAdmin();
     }
 
     /**
@@ -45,22 +45,6 @@ class AdditionalServicePolicy
      */
     public function delete(User $user, AdditionalService $additionalService): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, AdditionalService $additionalService): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, AdditionalService $additionalService): bool
-    {
-        //
+        return $user->isAdmin();
     }
 }

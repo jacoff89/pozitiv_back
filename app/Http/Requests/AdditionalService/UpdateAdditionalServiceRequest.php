@@ -25,7 +25,8 @@ class UpdateAdditionalServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
         ];
     }
 }

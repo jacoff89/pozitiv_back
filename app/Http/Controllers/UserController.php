@@ -7,7 +7,6 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
-use App\Models\Tourist;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

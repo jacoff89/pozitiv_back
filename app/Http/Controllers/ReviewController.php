@@ -39,6 +39,7 @@ class ReviewController extends Controller
      */
     public function store(StoreReviewRequest $request)
     {
+        $this->authorize('create', $this->review);
         $params = $request->only('name', 'text', 'link');
 
         try {
@@ -65,6 +66,7 @@ class ReviewController extends Controller
      */
     public function update(UpdateReviewRequest $request, $id)
     {
+        $this->authorize('update', $this->review);
         $params = $request->only('name', 'text', 'link');
 
         if (empty($params) && !$request->img) {

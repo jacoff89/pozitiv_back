@@ -7,9 +7,9 @@ use App\Models\AdditionalService;
 
 class AdditionalServiceRepository implements AdditionalServiceRepositoryInterface
 {
-    public function index()
+    public function index(array $queryParams, $filter)
     {
-        return AdditionalService::all();
+        return $filter->apply(AdditionalService::query(), $queryParams)->get();
     }
 
     public function getById($id)
