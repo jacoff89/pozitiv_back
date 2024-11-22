@@ -9,23 +9,24 @@ use App\Http\Resources\UserResource;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    private TouristRepositoryInterface $touristRepositoryInterface;
+    private UserService $userService;
 
     private UserRepositoryInterface $userRepositoryInterface;
 
-    public function __construct(UserRepositoryInterface $userRepositoryInterface, TouristRepositoryInterface $touristRepositoryInterface)
-    {
+    public function __construct(
+        UserService $userService,
+        UserRepositoryInterface $userRepositoryInterface,
+    ) {
+        $this->userService = $userService;
         $this->userRepositoryInterface = $userRepositoryInterface;
-        $this->touristRepositoryInterface = $touristRepositoryInterface;
     }
 
     public function getCurrent()
@@ -40,30 +41,20 @@ class UserController extends Controller
         $params = $request->only('email');
         if (!Auth::user()->isAdmin()) abort(401);
         $users = $this->userRepositoryInterface->index($params, $filter);
-        
+
         return JsonResponseHelper::success(UserResource::collection($users));
     }
 
     public function register(StoreUserRequest $request)
     {
-        $userParams = $request->only('email');
-        $userParams['password'] = Hash::make($request->password);
+        $params = $request->only('email', 'password', 'first_name', 'last_name', 'phone');
 
-        $touristParams = $request->only('first_name', 'last_name', 'phone');
-
-        DB::beginTransaction();
         try {
-            $user = $this->userRepositoryInterface->store($userParams);
-            $touristParams['user_id'] = $user->id;
+            $user = $this->userService->createUserWithTourist($params);
+            return JsonResponseHelper::success($user, __('messages.user.added'), 201);
 
-            $tourist = $this->touristRepositoryInterface->store($touristParams);
-            $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $tourist->id]);
-            DB::commit();
-
-            return JsonResponseHelper::success(['token' => $user->createToken("WEB APP")->plainTextToken], __('messages.user.added'), 201);
 
         } catch (\Throwable $th) {
-            DB::rollBack();
             return JsonResponseHelper::error(__('messages.user.add_err'), 500, $th->getMessage());
         }
     }
@@ -94,7 +85,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        if(!Auth::user()) return JsonResponseHelper::error(__('messages.user.already_logout'), 401);
+        if (!Auth::user()) return JsonResponseHelper::error(__('messages.user.already_logout'), 401);
 
         Auth::user()->currentAccessToken()->delete();
         return JsonResponseHelper::success('', __('messages.user.logout'));

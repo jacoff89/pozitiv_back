@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Services;
+
+use App\Helpers\JsonResponseHelper;
+use App\Interfaces\TouristRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class UserService
+{
+    private TouristRepositoryInterface $touristRepositoryInterface;
+
+    private UserRepositoryInterface $userRepositoryInterface;
+
+    public function __construct(
+        UserRepositoryInterface $userRepositoryInterface,
+        TouristRepositoryInterface $touristRepositoryInterface
+    ) {
+        $this->userRepositoryInterface = $userRepositoryInterface;
+        $this->touristRepositoryInterface = $touristRepositoryInterface;
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function createUserWithTourist($params): array
+    {
+        $userParams['email'] = $params['email'];
+        $userParams['password'] = Hash::make($params['password']);
+
+        $touristParams = [
+            'first_name' => $params['first_name'],
+            'last_name' => $params['last_name'],
+            'phone' => $params['phone'],
+        ];
+
+        DB::beginTransaction();
+        try {
+            $user = $this->userRepositoryInterface->store($userParams);
+            $touristParams['user_id'] = $user->id;
+
+            $tourist = $this->touristRepositoryInterface->store($touristParams);
+            $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $tourist->id]);
+            $token = $user->createToken("WEB APP")->plainTextToken;
+
+            DB::commit();
+
+            return [
+                'id' => $user->id,
+                'email' => $user->email,
+                'token' => $token,
+                'main_tourist' => $tourist,
+            ];
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+    }
+}
