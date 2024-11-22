@@ -3,9 +3,13 @@
 namespace App\Services;
 
 use App\Interfaces\OrderRepositoryInterface;
+use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\TripRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -15,75 +19,76 @@ class OrderService
 
     private UserRepositoryInterface $userRepository;
 
+    private TouristRepositoryInterface $touristRepository;
+
+    private UserService $userService;
+
+    private User $user;
+
+    private Trip $trip;
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         TripRepositoryInterface $tripRepository,
         UserRepositoryInterface $userRepository,
+        TouristRepositoryInterface $touristRepository,
+        UserService $userService,
     ) {
         $this->orderRepository = $orderRepository;
         $this->tripRepository = $tripRepository;
         $this->userRepository = $userRepository;
+        $this->touristRepository = $touristRepository;
+        $this->userService = $userService;
     }
 
-    public function createOrder($params)
+    /**
+     * @throws \Exception
+     */
+    public function createOrder(array $orderParams, array $userParams = null)
     {
         DB::beginTransaction();
         try {
-            $trip = $this->tripRepository->getById($params['trip_id'], ['orders']);
-            $user = $this->userRepository->getById($params['user_id'], ['tourists']);
+            $this->trip = $this->tripRepository->getById($orderParams['trip_id'], ['orders']);
 
-            //Проверим есть ли места для бронирования
-            $touristLimit = $trip->tourist_limit;
-            $signUpTourists = 0;
-            foreach ($trip->orders as $order) {
-                $signUpTourists += $order->tourists_count;
-            }
-            $signUpTourists += count($params['tourists']);
-            if ($signUpTourists > $touristLimit) throw new \Exception(__('messages.order.not_seats'));
+            //В случае создания пользователя прибавляем основного туриста
+            $touristsCount = ($userParams) ? count($orderParams['tourists']) + 1 : count($orderParams['tourists']);
+            $checkPlaces = $this->checkingPlacesForReservations($touristsCount);
+            if (!$checkPlaces) throw new \Exception(__('messages.order.not_seats'));
 
-            //Проверим что туристы существуют и привязаны к данному юзеру
-            foreach ($user->tourists as $tourist) {
-                $allTouristIds[] = $tourist->id;
-            }
-            foreach ($params['tourists'] as $val) {
-                if (!in_array($val, $allTouristIds)) throw new \Exception(__('messages.order.no_tourist'));
+            if ($userParams) {
+                $newUserData = $this->createUserAndTourists($userParams, $orderParams['tourists']);
+                $orderParams['tourists'] = $newUserData['tourists'];
+                $orderParams['user_id'] = $newUserData['user_id'];
             }
 
-            $costSum = $trip->cost * count($params['tourists']);
-            $minCostSum = $trip->min_cost * count($params['tourists']);
-            $bonusesSum = $trip->bonuses * count($params['tourists']);
+            $this->user = $this->userRepository->getById($orderParams['user_id'], ['tourists']);
 
-            //Посчитаем сумму, предоплату и бонусы с заказа доп. услуг
-            if (isset($params['additional_services'])) {
-                foreach ($params['additional_services'] as $additional_service) {
-                    $res = DB::table('additional_service_trip')
-                        ->where('trip_id', $params['trip_id'])
-                        ->where('additional_service_id', $additional_service['id'])
-                        ->first();
-                    if (!$res) throw new \Exception(__('messages.order.no_service'));
-
-                    $costSum += $res->cost * $additional_service['count'];
-                    $minCostSum += $res->min_сost * $additional_service['count'];
-                    $bonusesSum += $res->bonuses * $additional_service['count'];
-                    $additionalServices[$additional_service['id']] = ['count' => $additional_service['count']];
-                }
+            if (!$userParams && !$this->checkingTourists($orderParams['tourists'])) {
+                throw new \Exception(__('messages.order.no_tourist'));
             }
+
+            $calculateData = $this->calculateAllAmounts(count($orderParams['tourists']), $orderParams['additional_services']);
 
             $orderData = [
-                'user_id' => $params['user_id'],
-                'trip_id' => $params['trip_id'],
-                'comment' => $params['comment'],
-                'amount' => $costSum,
-                'prepayment' => $minCostSum,
-                'bonuses' => $bonusesSum,
-                'tourists_count' => count($params['tourists']),
+                'user_id' => $orderParams['user_id'],
+                'trip_id' => $orderParams['trip_id'],
+                'comment' => $orderParams['comment'],
+                'amount' => $calculateData['costSum'],
+                'prepayment' => $calculateData['minCostSum'],
+                'bonuses' => $calculateData['bonusesSum'],
+                'tourists_count' => $touristsCount,
             ];
 
             $order = $this->orderRepository->store($orderData);
 
-            $order->tourists()->attach($params['tourists']);
+            $order->tourists()->attach($orderParams['tourists']);
 
-            if (isset($additionalServices)) $order->additionalServices()->attach($additionalServices);
+            if (isset($orderParams['additional_services'])) {
+                foreach ($orderParams['additional_services'] as $service) {
+                    $order->additionalServices()->attach($service['id'], ['count' => $service['count']]);
+                }
+            }
+
             DB::commit();
 
             return $order;
@@ -92,5 +97,84 @@ class OrderService
             DB::rollBack();
             throw $ex;
         }
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function createUserAndTourists($userParams, $tourists): array
+    {
+        $userParams['password'] = Str::random(12);
+        $newUserData = $this->userService->createUserWithTourist($userParams);
+        $res['user_id'] = $newUserData['id'];
+        $newTourists[] = $newUserData['main_tourist']->id;
+        foreach ($tourists as $newTourist) {
+            $newTourist['user_id'] = $newUserData['id'];
+            $newTourists[] = $this->touristRepository->store($newTourist)->id;
+        }
+        $res['tourists'] = $newTourists;
+
+        return $res;
+    }
+
+    private function checkingPlacesForReservations(int $touristsCount): bool
+    {
+        $touristLimit = $this->trip->tourist_limit;
+        $signUpTourists = 0;
+        foreach ($this->trip->orders as $order) {
+            $signUpTourists += $order->tourists_count;
+        }
+        $signUpTourists += $touristsCount;
+
+        if ($signUpTourists > $touristLimit) return false;
+
+        return true;
+    }
+
+    private function checkingTourists(array $tourists): bool
+    {
+        foreach ($this->user->tourists as $tourist) {
+            $allTouristIds[] = $tourist->id;
+        }
+        foreach ($tourists as $val) {
+            if (!in_array($val, $allTouristIds)) return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function calculateAllAmounts(int $touristsCount, array|null $additionalServices): array
+    {
+        //Посчитаем сумму общую, минимальную и кол-во бонусов с тура
+        $costSum = $this->trip->cost * $touristsCount;
+        $minCostSum = $this->trip->min_cost * $touristsCount;
+        $bonusesSum = $this->trip->bonuses * $touristsCount;
+
+        //Посчитаем сумму, предоплату и бонусы с заказа доп. услуг
+        if (isset($additionalServices)) {
+            foreach ($additionalServices as $additionalService) {
+
+                // TODO: Ликвидировать костыль
+                $dbRes = DB::table('additional_service_trip')
+                    ->where('trip_id', $this->trip->id)
+                    ->where('additional_service_id', $additionalService['id'])
+                    ->first();
+                if (!$dbRes) throw new \Exception(__('messages.order.no_service'));
+
+                $costSum += $dbRes->cost * $additionalService['count'];
+                $minCostSum += $dbRes->min_сost * $additionalService['count'];
+                $bonusesSum += $dbRes->bonuses * $additionalService['count'];
+
+            }
+        }
+
+        return [
+            'costSum' => $costSum,
+            'minCostSum' => $minCostSum,
+            'bonusesSum' => $bonusesSum,
+        ];
     }
 }

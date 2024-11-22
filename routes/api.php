@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
 
     Route::apiResource('tours/{tour_id}/trips', TripController::class);
 
+    Route::post('orders/create_user', [OrderController::class, 'createWithUser']);
     Route::apiResource('orders', OrderController::class);
 
     Route::get('wp-json/tour/get', [TourController::class, 'getOldTours'])->name('oldTours');

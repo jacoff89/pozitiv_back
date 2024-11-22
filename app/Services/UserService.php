@@ -41,8 +41,8 @@ class UserService
             $user = $this->userRepositoryInterface->store($userParams);
             $touristParams['user_id'] = $user->id;
 
-            $tourist = $this->touristRepositoryInterface->store($touristParams);
-            $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $tourist->id]);
+            $mainTourist = $this->touristRepositoryInterface->store($touristParams);
+            $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $mainTourist->id]);
             $token = $user->createToken("WEB APP")->plainTextToken;
 
             DB::commit();
@@ -51,7 +51,7 @@ class UserService
                 'id' => $user->id,
                 'email' => $user->email,
                 'token' => $token,
-                'main_tourist' => $tourist,
+                'main_tourist' => $mainTourist,
             ];
 
         } catch (\Throwable $th) {

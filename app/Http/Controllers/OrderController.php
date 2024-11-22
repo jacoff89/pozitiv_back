@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\JsonResponseHelper;
 use App\Http\Filters\OrderFilter;
 use App\Http\Requests\Order\StoreOrderRequest;
+use App\Http\Requests\Order\StoreOrderWithUserRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Interfaces\OrderRepositoryInterface;
@@ -53,6 +54,20 @@ class OrderController extends Controller
 
         try {
             $order = $this->orderService->createOrder($params);
+            return JsonResponseHelper::success(new OrderResource($order), __('messages.order.added'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.order.add_err'), 400, $ex->getMessage());
+        }
+    }
+
+    public function createWithUser(StoreOrderWithUserRequest $request)
+    {
+        $orderParams = $request->only('trip_id', 'comment', 'additional_services', 'tourists');
+        $userParams = $request->only('first_name', 'last_name', 'email', 'phone');
+
+        try {
+            $order = $this->orderService->createOrder($orderParams, $userParams);
             return JsonResponseHelper::success(new OrderResource($order), __('messages.order.added'), 201);
 
         } catch (\Exception $ex) {
