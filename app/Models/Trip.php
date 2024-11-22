@@ -40,7 +40,7 @@ class Trip extends Model
      */
     public function additionalServices(): BelongsToMany
     {
-        return $this->belongsToMany(AdditionalService::class)->withPivot('cost', 'bonuses');
+        return $this->belongsToMany(AdditionalService::class)->withPivot('cost', 'min_сost', 'bonuses');
     }
 
     /**

@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
 use App\Models\Review;
 use App\Models\Tour;
 use App\Models\Tourist;
 use App\Models\Trip;
+use App\Policies\OrderPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\TouristPolicy;
 use App\Policies\TourPolicy;
@@ -19,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
         Tour::class => TourPolicy::class,
         Trip::class => TripPolicy::class,
         Tourist::class => TouristPolicy::class,
+        Order::class => OrderPolicy::class,
     ];
 
     public function register(): void

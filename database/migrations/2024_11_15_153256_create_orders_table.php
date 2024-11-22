@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('trip_id');
             $table->integer('amount');
             $table->integer('prepayment');
+            $table->integer('bonuses');
             $table->integer('tourists_count');
             $table->text('comment');
             $table->timestamps();

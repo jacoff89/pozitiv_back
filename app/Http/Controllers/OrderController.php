@@ -47,9 +47,17 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
+        $this->authorize('create', $this->order);
         $params = $request->only('user_id', 'trip_id', 'comment', 'additional_services', 'tourists');
+        if (!Auth::user()->isAdmin()) $params['user_id'] = Auth::id();
 
-        $order = $this->orderService->createOrder($params);
+        try {
+            $order = $this->orderService->createOrder($params);
+            return JsonResponseHelper::success(new OrderResource($order), __('messages.order.added'), 201);
+
+        } catch (\Exception $ex) {
+            return JsonResponseHelper::error(__('messages.order.add_err'), 400, $ex->getMessage());
+        }
     }
 
     /**
