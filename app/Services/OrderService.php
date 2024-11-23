@@ -100,7 +100,7 @@ class OrderService
     }
 
     /**
-     * @throws \Throwable
+     * @throws \Exception
      */
     private function createUserAndTourists($userParams, $tourists): array
     {

@@ -6,7 +6,6 @@ use App\Helpers\JsonResponseHelper;
 use App\Http\Filters\UserFilter;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Resources\UserResource;
-use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use App\Services\UserService;
@@ -54,7 +53,7 @@ class UserController extends Controller
             return JsonResponseHelper::success($user, __('messages.user.added'), 201);
 
 
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return JsonResponseHelper::error(__('messages.user.add_err'), 500, $th->getMessage());
         }
     }
@@ -78,7 +77,7 @@ class UserController extends Controller
 
             return JsonResponseHelper::success(['token' => $user->createToken("WEB APP")->plainTextToken], __('messages.user.logged'));
 
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return JsonResponseHelper::error(__('messages.user.login_err'), 500, $th->getMessage());
         }
     }

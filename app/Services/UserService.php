@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Helpers\JsonResponseHelper;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +22,7 @@ class UserService
     }
 
     /**
-     * @throws \Throwable
+     * @throws \Exception
      */
     public function createUserWithTourist($params): array
     {
@@ -54,7 +53,7 @@ class UserService
                 'main_tourist' => $mainTourist,
             ];
 
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             DB::rollBack();
             throw $th;
         }
