@@ -14,7 +14,6 @@ class TripResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // TODO: Изменить на снеккейс после правки фронта
         return [
             'id' =>$this->id,
             'cost' => $this->cost,

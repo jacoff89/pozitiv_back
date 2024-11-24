@@ -15,7 +15,6 @@ class TourResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // TODO: Изменить на снеккейс после правки фронта
         foreach ($this->images as $img) {
             $images[] = Storage::disk('public')->url($img);
         }
