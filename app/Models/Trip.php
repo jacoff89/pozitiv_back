@@ -23,8 +23,8 @@ class Trip extends Model
     ];
 
     protected $casts = [
-        'dateStart' => 'date:d.m.Y',
-        'dateEnd' => 'date:d.m.Y',
+        'date_start' => 'date',
+        'date_end' => 'date',
     ];
 
     /**

@@ -14,14 +14,15 @@ class TripResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // TODO: Изменить на снеккейс после правки фронта
         return [
             'id' =>$this->id,
             'cost' => $this->cost,
-            'min_cost' => $this->min_cost,
-            'date_start' => $this->date_start,
-            'date_end' => $this->date_end,
-            'tourist_limit' => $this->tourist_limit,
-            'additional_services' => $this->additionalServices,
+            'minCost' => $this->min_cost,
+            'dateStart' => $this->date_start->format('d.m.Y'),
+            'dateEnd' => $this->date_end->format('d.m.Y'),
+            'touristLimit' => $this->tourist_limit,
+            'services' => AdditionalServiceResource::collection($this->additionalServices),
             'bonuses' => $this->bonuses,
             'orders' => $this->orders,
         ];
