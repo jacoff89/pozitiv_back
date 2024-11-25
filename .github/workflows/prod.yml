@@ -1,4 +1,4 @@
-name: Деплой на дев сервер
+name: Деплой на прод сервер
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
             rm ~/api.pozitiv74.ru/prod_archive.zip
 
             # Настраиваем окружение
-            mv .env.dev .env
+            mv .env.prod .env
             echo "DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}" >> .env
             echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> .env
             echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> .env
