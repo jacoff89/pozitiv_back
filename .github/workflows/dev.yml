@@ -1,0 +1,57 @@
+name: Деплой на дев сервер
+
+on:
+  push:
+    branches:
+      - dev  # Запускать при пуше в ветку dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Архивация репозитория
+        run: zip -r dev_archive.zip ./ -x *.git* -x /.docker/* -x /docker-compose.yml -x /storage/*
+      - name: Создание SSH ключа
+        run: |
+          echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
+          chmod 600 private_key
+      - name: Копирование проекта на сервер
+        run: scp -P 2522 -i private_key -o StrictHostKeyChecking=no dev_archive.zip pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
+      - name: Распаковка проекта
+        run: |
+          ssh -p 2522 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 << 'EOF'
+            # Создаем новую директорию для развертывания
+            mkdir -p ~/dev.api.pozitiv74.ru/www_new
+            cd ~/dev.api.pozitiv74.ru/www_new
+
+            # Распаковываем архив и удаляем его
+            unzip ~/dev.api.pozitiv74.ru/dev_archive.zip
+            rm ~/dev.api.pozitiv74.ru/dev_archive.zip
+
+            # Настраиваем окружение
+            mv .env.dev .env
+            echo "DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}" >> .env
+            echo "DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> .env
+            echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> .env
+
+            # Устанавливаем зависимости и выполняем миграции
+            composer install
+            php artisan migrate
+
+            Переименовываем папку с новой версией и переходим в нее
+            mv ~/dev.api.pozitiv74.ru/www ~/dev.api.pozitiv74.ru/www_old
+            mv ~/dev.api.pozitiv74.ru/www_new ~/dev.api.pozitiv74.ru/www
+            cd ~/dev.api.pozitiv74.ru/www
+
+            # Настраиваем хранилище
+            ln -s ~/dev.api.pozitiv74.ru/storage ~/dev.api.pozitiv74.ru/www/storage
+            php artisan storage:link
+
+            # Генерируем ключ и очищаем кеш
+            php artisan key:generate
+            php artisan config:cache
+
+            # Удаляем папку со старой версией
+            rm -rf ~/dev.api.pozitiv74.ru/www_old
