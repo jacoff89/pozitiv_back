@@ -4,7 +4,6 @@ namespace App\Http\Requests\Trip;
 
 use App\Traits\Validation;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class StoreTripRequest extends FormRequest
 {
@@ -26,13 +25,13 @@ class StoreTripRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'tour_id' => 'nullable|integer',
             'cost' => 'required|integer',
             'min_cost' => 'required|integer',
             'date_start' => 'required|date',
             'date_end' => 'required|date',
             'tourist_limit' => 'required|integer',
             'bonuses' => 'required|integer',
-            'tour_id' => 'nullable|integer',
         ];
     }
 }

@@ -42,7 +42,7 @@ class TripController extends Controller
     public function store(StoreTripRequest $request, $tour_id = null)
     {
         $this->authorize('create', $this->trip);
-        $params = $request->only('cost', 'min_cost', 'date_start', 'date_end', 'tourist_limit', 'bonuses', 'tour_id');
+        $params = $request->only('tour_id', 'cost', 'min_cost', 'date_start', 'date_end', 'tourist_limit', 'bonuses');
         if ($tour_id ) {
             if (!is_numeric($tour_id)) abort(404);
             $params['tour_id'] = (int)$tour_id;

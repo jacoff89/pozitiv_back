@@ -67,7 +67,7 @@ class OrderService
                 throw new \Exception(__('messages.order.no_tourist'));
             }
 
-            $calculateData = $this->calculateAllAmounts(count($orderParams['tourists']), $orderParams['additional_services']);
+            $calculateData = $this->calculateAllAmounts(count($orderParams['tourists']), $orderParams['additional_services'] ?? null);
 
             $orderData = [
                 'user_id' => $orderParams['user_id'],
