@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\TouristResource;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ class UserService
                 'id' => $user->id,
                 'email' => $user->email,
                 'token' => $token,
-                'main_tourist' => $mainTourist,
+                'mainTourist' => new TouristResource($mainTourist),
             ];
 
         } catch (\Exception $th) {

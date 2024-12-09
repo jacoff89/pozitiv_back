@@ -38,7 +38,7 @@ class UserController extends Controller
     public function getAll(FormRequest $request, UserFilter $filter)
     {
         $params = $request->only('email');
-        if (!Auth::user()->isAdmin()) abort(401);
+        if (!Auth::user() || !Auth::user()->isAdmin()) abort(401);
         $users = $this->userRepositoryInterface->index($params, $filter);
 
         return JsonResponseHelper::success(UserResource::collection($users));
@@ -73,9 +73,11 @@ class UserController extends Controller
                 return JsonResponseHelper::error(__('messages.user.does_not_match'), 401);
             }
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->with('mainTourist')->first();
+            $token = $user->createToken("WEB APP")->plainTextToken;
+            $userResource = (new UserResource($user))->additional(['token' => $token]);
 
-            return JsonResponseHelper::success(['token' => $user->createToken("WEB APP")->plainTextToken], __('messages.user.logged'));
+            return JsonResponseHelper::success($userResource, __('messages.user.logged'));
 
         } catch (\Exception $th) {
             return JsonResponseHelper::error(__('messages.user.login_err'), 500, $th->getMessage());

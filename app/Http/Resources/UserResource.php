@@ -17,7 +17,9 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'email' => $this->email,
-            'mainTourist' => $this->mainTourist,
+            'token' => $this->additional['token'] ?? '',
+            'isAdmin' => $this->isAdmin(),
+            'mainTourist' => new TouristResource($this->mainTourist),
         ];
     }
 }
