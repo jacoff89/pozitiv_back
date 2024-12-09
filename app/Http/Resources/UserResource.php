@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'token' => $this->additional['token'] ?? '',
             'isAdmin' => $this->isAdmin(),
             'mainTourist' => new TouristResource($this->mainTourist),
+            'orders' => OrderResource::collection($this->orders),
         ];
     }
 }
