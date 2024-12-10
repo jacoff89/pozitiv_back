@@ -23,7 +23,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('tours', TourController::class);
     Route::apiResource('tourists',TouristController::class);
     Route::apiResource('reviews',ReviewController::class);
-    Route::apiResource('additional_service',AdditionalServiceController::class);
+    Route::apiResource('additional-service',AdditionalServiceController::class);
 
     Route::apiResource('tours/{tour_id}/trips', TripController::class);
 
