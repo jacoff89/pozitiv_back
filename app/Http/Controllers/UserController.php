@@ -50,7 +50,10 @@ class UserController extends Controller
 
         try {
             $user = $this->userService->createUserWithTourist($params);
-            return JsonResponseHelper::success($user, __('messages.user.added'), 201);
+            $token = $user->createToken("WEB APP")->plainTextToken;
+            $userResource = (new UserResource($user))->additional(['token' => $token]);
+
+            return JsonResponseHelper::success($userResource, __('messages.user.added'), 201);
 
 
         } catch (\Exception $th) {

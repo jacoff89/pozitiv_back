@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('prepayment');
             $table->integer('bonuses');
             $table->integer('tourists_count');
-            $table->text('comment');
+            $table->text('comment')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('trip_id')->references('id')->on('trips');

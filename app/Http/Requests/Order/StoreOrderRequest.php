@@ -27,7 +27,7 @@ class StoreOrderRequest extends FormRequest
         return [
             'user_id' => 'required|integer',
             'trip_id' => 'required|integer',
-            'comment' => 'required|string',
+            'comment' => 'nullable|string',
             'additional_services' => 'nullable|array',
             'additional_services.*' => 'required|array',
             'additional_services.*.id' => 'required|integer',

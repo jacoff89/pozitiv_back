@@ -9,7 +9,6 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -44,7 +43,7 @@ class OrderService
     /**
      * @throws \Exception
      */
-    public function createOrder(array $orderParams, array $userParams = null)
+    public function createOrder(array $orderParams, array $userParams = null): array
     {
         DB::beginTransaction();
         try {
@@ -91,7 +90,10 @@ class OrderService
 
             DB::commit();
 
-            return $order;
+            return [
+                'order' => $order,
+                'user' => $this->user,
+            ];
 
         } catch (\Exception $ex) {
             DB::rollBack();
@@ -104,10 +106,9 @@ class OrderService
      */
     private function createUserAndTourists($userParams, $tourists): array
     {
-        $userParams['password'] = Str::random(12);
         $newUserData = $this->userService->createUserWithTourist($userParams);
         $res['user_id'] = $newUserData['id'];
-        $newTourists[] = $newUserData['main_tourist']->id;
+        $newTourists[] = $newUserData['mainTourist']->id;
         foreach ($tourists as $newTourist) {
             $newTourist['user_id'] = $newUserData['id'];
             $newTourists[] = $this->touristRepository->store($newTourist)->id;

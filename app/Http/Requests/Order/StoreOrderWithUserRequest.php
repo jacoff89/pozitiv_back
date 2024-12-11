@@ -30,7 +30,7 @@ class StoreOrderWithUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string',
             'trip_id' => 'required|integer',
-            'comment' => 'required|string',
+            'comment' => 'nullable|string',
             'additional_services' => 'nullable|array',
             'additional_services.*' => 'required|array',
             'additional_services.*.id' => 'required|integer',

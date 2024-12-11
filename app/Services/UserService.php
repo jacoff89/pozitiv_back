@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Resources\TouristResource;
 use App\Interfaces\TouristRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -25,10 +24,12 @@ class UserService
     /**
      * @throws \Exception
      */
-    public function createUserWithTourist($params): array
+    public function createUserWithTourist($params)
     {
-        $userParams['email'] = $params['email'];
-        $userParams['password'] = Hash::make($params['password']);
+        $userParams = [
+            'email' => $params['email'],
+            'password' => Hash::make($params['password']),
+        ];
 
         $touristParams = [
             'first_name' => $params['first_name'],
@@ -43,16 +44,10 @@ class UserService
 
             $mainTourist = $this->touristRepositoryInterface->store($touristParams);
             $this->userRepositoryInterface->update($user->id, ['main_tourist_id' => $mainTourist->id]);
-            $token = $user->createToken("WEB APP")->plainTextToken;
 
             DB::commit();
 
-            return [
-                'id' => $user->id,
-                'email' => $user->email,
-                'token' => $token,
-                'mainTourist' => new TouristResource($mainTourist),
-            ];
+            return $this->userRepositoryInterface->getById($user->id);
 
         } catch (\Exception $th) {
             DB::rollBack();

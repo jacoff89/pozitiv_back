@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -49,11 +50,11 @@ class OrderController extends Controller
     public function store(StoreOrderRequest $request)
     {
         $this->authorize('create', $this->order);
-        $params = $request->only('user_id', 'trip_id', 'comment', 'additional_services', 'tourists');
+        $orderParams = $request->only('user_id', 'trip_id', 'comment', 'additional_services', 'tourists');
         if (!Auth::user()->isAdmin()) $params['user_id'] = Auth::id();
 
         try {
-            $order = $this->orderService->createOrder($params);
+            $order = $this->orderService->createOrder($orderParams);
             return JsonResponseHelper::success(new OrderResource($order), __('messages.order.added'), 201);
 
         } catch (\Exception $ex) {
@@ -65,10 +66,14 @@ class OrderController extends Controller
     {
         $orderParams = $request->only('trip_id', 'comment', 'additional_services', 'tourists');
         $userParams = $request->only('first_name', 'last_name', 'email', 'phone');
+        $userParams['password'] = Str::random(12);
 
         try {
-            $order = $this->orderService->createOrder($orderParams, $userParams);
-            return JsonResponseHelper::success(new OrderResource($order), __('messages.order.added'), 201);
+            $createOrder = $this->orderService->createOrder($orderParams, $userParams);
+            $token = $createOrder['user']->createToken("WEB APP")->plainTextToken;
+            $orderResource = (new OrderResource($createOrder['order']))->additional(['token' => $token]);
+
+            return JsonResponseHelper::success($orderResource, __('messages.order.added'), 201);
 
         } catch (\Exception $ex) {
             return JsonResponseHelper::error(__('messages.order.add_err'), 400, $ex->getMessage());

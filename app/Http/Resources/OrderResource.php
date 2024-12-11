@@ -16,7 +16,7 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'userId' => $this->user_id,
+            'authToken' => $this->additional['token'] ?? '',
             'tripId' => $this->trip_id,
             'amount' => $this->amount,
             'prepayment' => $this->prepayment,
