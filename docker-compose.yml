@@ -5,16 +5,16 @@ services:
     container_name: pozitiv-nginx
     working_dir: /app
     depends_on:
-      - pozitiv-php-fpm83
+      - pozitiv-php-fpm84
     volumes:
       - .:/app
       - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "${NGINX_PORT}:80"
 
-  pozitiv-php-fpm83:
-    container_name: pozitiv-php-fpm83
-    build: .docker/php-fpm83
+  pozitiv-php-fpm84:
+    container_name: pozitiv-php-fpm84
+    build: .docker/php-fpm84
     working_dir: /app
     volumes:
       - .:/app
