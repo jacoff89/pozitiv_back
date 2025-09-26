@@ -30,7 +30,7 @@ jobs:
 
             # Распаковываем архив и удаляем его
             unzip ~/dev.api.pozitiv74.ru/dev_archive.zip
-            rm ~/dev.api.pozitiv74.ru/dev_archive.zip
+            #rm ~/dev.api.pozitiv74.ru/dev_archive.zip
 
             # Настраиваем окружение
             mv .env.dev .env
@@ -56,5 +56,5 @@ jobs:
             #php artisan config:cache
 
             # Удаляем папку со старой версией
-            #rm -rf ~/dev.api.pozitiv74.ru/www_old
+            rm -rf ~/dev.api.pozitiv74.ru/www_old
           '
