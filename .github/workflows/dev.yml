@@ -57,4 +57,4 @@ jobs:
 
             # Удаляем папку со старой версией
             rm -rf ~/dev.api.pozitiv74.ru/www_old
-         '
+          '
