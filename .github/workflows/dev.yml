@@ -18,9 +18,7 @@ jobs:
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
           chmod 600 private_key
       - name: Копирование проекта на сервер
-        run: |
-          scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip \
-          pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
+        run: scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
       - name: Распаковка проекта
         run: |
           ssh -p 2622 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 << 'EOF'
