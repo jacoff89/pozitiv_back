@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Архивация репозитория
-        run: zip -r dev_archive.zip ./ -x "*.git* -x /storage/*"
+        run: zip -r dev_archive.zip ./ -x "*.git* -x storage/*"
       - name: Создание SSH ключа
         run: |
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
