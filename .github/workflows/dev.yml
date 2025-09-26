@@ -17,8 +17,6 @@ jobs:
         run: |
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
           chmod 600 private_key
-      - name: Копирование проекта на сервер
-        run: echo 123
       - name: Распаковка проекта
         run: |
           ssh -p 2622 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 << 'EOF'
