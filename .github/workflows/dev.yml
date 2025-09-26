@@ -49,14 +49,14 @@ jobs:
             docker-compose up --build -d
 
             # Устанавливаем зависимости и выполняем миграции
-            docker exec -ti pozitiv-php-fpm composer install
-            docker exec -ti pozitiv-php-fpm php artisan migrate
+            #docker exec -ti pozitiv-php-fpm composer install
+            #docker exec -ti pozitiv-php-fpm php artisan migrate
 
             # Настраиваем хранилище
-            ln -s ~/dev.api.pozitiv74.ru/storage ~/dev.api.pozitiv74.ru/www/storage
-            docker exec -ti pozitiv-php-fpm php artisan storage:link
+            #ln -s ~/dev.api.pozitiv74.ru/storage ~/dev.api.pozitiv74.ru/www/storage
+            #docker exec -ti pozitiv-php-fpm php artisan storage:link
 
             # Генерируем ключ и очищаем кеш
-            docker exec -ti pozitiv-php-fpm php artisan key:generate
-            docker exec -ti pozitiv-php-fpm php artisan config:cache
+            #docker exec -ti pozitiv-php-fpm php artisan key:generate
+            #docker exec -ti pozitiv-php-fpm php artisan config:cache
           '
