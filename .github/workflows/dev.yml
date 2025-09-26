@@ -49,7 +49,7 @@ jobs:
             docker-compose up --build -d
 
             # Устанавливаем зависимости и выполняем миграции
-            #docker exec -ti pozitiv-php-fpm composer install
+            docker exec -ti pozitiv-php-fpm composer install
             #docker exec -ti pozitiv-php-fpm php artisan migrate
 
             # Настраиваем хранилище
