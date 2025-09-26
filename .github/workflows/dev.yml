@@ -18,8 +18,7 @@ jobs:
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
           chmod 600 private_key
       - name: Копирование проекта на сервер
-        run: |
-          scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip \
+        run: scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip \
           pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
       - name: Распаковка проекта
         run: |
@@ -42,7 +41,7 @@ jobs:
 #            composer install
 #            php artisan migrate
 
-            Переименовываем папку с новой версией и переходим в нее
+            # Переименовываем папку с новой версией и переходим в нее
             mv ~/dev.api.pozitiv74.ru/www ~/dev.api.pozitiv74.ru/www_old
             mv ~/dev.api.pozitiv74.ru/www_new ~/dev.api.pozitiv74.ru/www
             cd ~/dev.api.pozitiv74.ru/www
