@@ -12,17 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Архивация репозитория
-        run: zip -r dev_archive.zip ./ -x *.git* -x /storage/*
+        run: zip -r dev_archive.zip ./ -x "*.git* -x /storage/*"
       - name: Создание SSH ключа
         run: |
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
           chmod 600 private_key
       - name: Копирование проекта на сервер
         run: |
-          scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
+          scp -P 2622 -i private_key -o StrictHostKeyChecking=no dev_archive.zip \
+          pozitiv@83.142.160.165:~/dev.api.pozitiv74.ru/
       - name: Распаковка проекта
         run: |
-          ssh -p 2622 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 << 'EOF'
+          ssh -p 2622 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 '
             # Создаем новую директорию для развертывания
             mkdir -p ~/dev.api.pozitiv74.ru/www_new
             cd ~/dev.api.pozitiv74.ru/www_new
@@ -56,3 +57,4 @@ jobs:
 
             # Удаляем папку со старой версией
             rm -rf ~/dev.api.pozitiv74.ru/www_old
+         '
