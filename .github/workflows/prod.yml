@@ -34,9 +34,9 @@ jobs:
 
             # Настраиваем окружение
             mv .env.prod .env
-            echo "DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}" >> .env
-            echo "DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> .env
+            echo "DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}" >> .env
+            echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> .env
+            echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> .env
 
             # Останавливаем контейнер и удаляем папку со старой версией
             cd ~/api.pozitiv74.ru/www
