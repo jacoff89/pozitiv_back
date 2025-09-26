@@ -40,7 +40,7 @@ jobs:
 
             # Останавливаем контейнер и удаляем папку со старой версией
             cd ~/api.pozitiv74.ru/www
-            docker-compose down
+            docker-compose down --remove-orphans
             mv storage ../storage
             rm -rf ~/api.pozitiv74.ru/www
 
@@ -54,7 +54,7 @@ jobs:
 
             # Устанавливаем зависимости и выполняем миграции
             docker exec -i pozitiv-php-fpm-prod composer install
-            docker exec -i pozitiv-php-fpm-prod php artisan migrate
+            docker exec -i pozitiv-php-fpm-prod php artisan migrate --force
 
             # Настраиваем хранилище
             docker exec -i pozitiv-php-fpm-prod php artisan storage:link
