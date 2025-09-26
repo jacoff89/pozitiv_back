@@ -41,11 +41,13 @@ jobs:
             # Останавливаем контейнер и удаляем папку со старой версией
             cd ~/dev.api.pozitiv74.ru/www
             docker-compose down
+            mv storage ../storage
             rm -rf ~/dev.api.pozitiv74.ru/www
 
             # Переименовываем папку с новой версией и поднимаем контейнер
             mv ~/dev.api.pozitiv74.ru/www_new ~/dev.api.pozitiv74.ru/www
             cd ~/dev.api.pozitiv74.ru/www
+            mv ../storage storage
             docker-compose up --build -d
 
             # Устанавливаем зависимости и выполняем миграции
@@ -53,7 +55,6 @@ jobs:
             docker exec -i pozitiv-php-fpm php artisan migrate
 
             # Настраиваем хранилище
-            ln -s ~/dev.api.pozitiv74.ru/storage ~/dev.api.pozitiv74.ru/www/storage
             docker exec -i pozitiv-php-fpm php artisan storage:link
 
             # Генерируем ключ и очищаем кеш
