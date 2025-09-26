@@ -30,7 +30,7 @@ jobs:
 
             # Распаковываем архив и удаляем его
             unzip ~/dev.api.pozitiv74.ru/dev_archive.zip
-            #rm ~/dev.api.pozitiv74.ru/dev_archive.zip
+            rm ~/dev.api.pozitiv74.ru/dev_archive.zip
 
             # Настраиваем окружение
             mv .env.dev .env
@@ -38,23 +38,25 @@ jobs:
             echo "DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> .env
             echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> .env
 
-            # Устанавливаем зависимости и выполняем миграции
-            #composer install
-            #php artisan migrate
+            # Останавливаем контейнер и удаляем папку со старой версией
+            cd ~/dev.api.pozitiv74.ru/www
+            docker-compose down
+            rm -rf ~/dev.api.pozitiv74.ru/www
 
-            # Переименовываем папку с новой версией и переходим в нее
-            mv ~/dev.api.pozitiv74.ru/www ~/dev.api.pozitiv74.ru/www_old
+            # Переименовываем папку с новой версией и поднимаем контейнер
             mv ~/dev.api.pozitiv74.ru/www_new ~/dev.api.pozitiv74.ru/www
             cd ~/dev.api.pozitiv74.ru/www
+            docker-compose up --build -d
+
+            # Устанавливаем зависимости и выполняем миграции
+            docker exec -ti pozitiv-php-fpm composer install
+            docker exec -ti pozitiv-php-fpm php artisan migrate
 
             # Настраиваем хранилище
             ln -s ~/dev.api.pozitiv74.ru/storage ~/dev.api.pozitiv74.ru/www/storage
-            #php artisan storage:link
+            docker exec -ti pozitiv-php-fpm php artisan storage:link
 
             # Генерируем ключ и очищаем кеш
-            #php artisan key:generate
-            #php artisan config:cache
-
-            # Удаляем папку со старой версией
-            rm -rf ~/dev.api.pozitiv74.ru/www_old
+            docker exec -ti pozitiv-php-fpm php artisan key:generate
+            docker exec -ti pozitiv-php-fpm php artisan config:cache
           '
