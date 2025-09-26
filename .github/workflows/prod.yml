@@ -3,7 +3,7 @@ name: Деплой на прод сервер
 on:
   push:
     branches:
-      - main  # Запускать при пуше в ветку main
+      - dev  # Запускать при пуше в ветку main
 
 jobs:
   deploy:
@@ -12,16 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Архивация репозитория
-        run: zip -r prod_archive.zip ./ -x *.git* -x /.docker/* -x /docker-compose.yml -x /storage/*
+        run: "zip -r prod_archive.zip ./ -x *.git* -x /storage/*"
       - name: Создание SSH ключа
         run: |
           echo "${{ secrets.SSH_DEPLOY_KEY }}" > private_key
           chmod 600 private_key
       - name: Копирование проекта на сервер
-        run: scp -P 2522 -i private_key -o StrictHostKeyChecking=no prod_archive.zip pozitiv@83.142.160.165:~/api.pozitiv74.ru/
+        run: |
+          scp -P 2622 -i private_key -o StrictHostKeyChecking=no prod_archive.zip \
+          pozitiv@83.142.160.165:~/api.pozitiv74.ru/
       - name: Распаковка проекта
         run: |
-          ssh -p 2522 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 << 'EOF'
+          ssh -p 2622 -i private_key -o StrictHostKeyChecking=no pozitiv@83.142.160.165 '
             # Создаем новую директорию для развертывания
             mkdir -p ~/api.pozitiv74.ru/www_new
             cd ~/api.pozitiv74.ru/www_new
@@ -32,26 +34,32 @@ jobs:
 
             # Настраиваем окружение
             mv .env.prod .env
-            echo "DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}" >> .env
-            echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> .env
+            echo "DB_DATABASE=${{ secrets.DEV_DB_DATABASE }}" >> .env
+            echo "DB_USERNAME=${{ secrets.DEV_DB_USERNAME }}" >> .env
+            echo "DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}" >> .env
 
-            # Устанавливаем зависимости и выполняем миграции
-            composer install
-            php artisan migrate
+            # Останавливаем контейнер и удаляем папку со старой версией
+            cd ~/api.pozitiv74.ru/www
+            docker-compose down
+            mv storage ../storage
+            rm -rf ~/api.pozitiv74.ru/www
 
-            Переименовываем папку с новой версией и переходим в нее
-            mv ~/api.pozitiv74.ru/www ~/api.pozitiv74.ru/www_old
+            # Переименовываем папку с новой версией и поднимаем контейнер
             mv ~/api.pozitiv74.ru/www_new ~/api.pozitiv74.ru/www
             cd ~/api.pozitiv74.ru/www
+            mv ../storage storage
+            mv -f docker-compose.prod.yml docker-compose.yml
+            mv -f .docker/nginx/nginx.prod.conf .docker/nginx/nginx.conf
+            docker-compose up --build -d
+
+            # Устанавливаем зависимости и выполняем миграции
+            docker exec -i pozitiv-php-fpm-prod composer install
+            docker exec -i pozitiv-php-fpm-prod php artisan migrate
 
             # Настраиваем хранилище
-            ln -s ~/api.pozitiv74.ru/storage ~/api.pozitiv74.ru/www/storage
-            php artisan storage:link
+            docker exec -i pozitiv-php-fpm-prod php artisan storage:link
 
             # Генерируем ключ и очищаем кеш
-            php artisan key:generate
-            php artisan config:cache
-
-            # Удаляем папку со старой версией
-            rm -rf ~/api.pozitiv74.ru/www_old
+            docker exec -i pozitiv-php-fpm-prod php artisan key:generate
+            docker exec -i pozitiv-php-fpm-prod php artisan config:cache
+          '
