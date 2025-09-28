@@ -19,7 +19,6 @@ services:
       args:
         UID: ${UID}
         GID: ${GID}
-    user: "${UID}:${GID}"
     working_dir: /app
     volumes:
       - .:/app
@@ -34,7 +33,6 @@ services:
       args:
         UID: ${UID}
         GID: ${GID}
-    user: "${UID}:${GID}"
     volumes:
       - ${DATABASES_PATH}:/var/lib/mysql
     environment:
