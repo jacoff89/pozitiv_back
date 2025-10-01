@@ -24,6 +24,8 @@ services:
       - .:/app
     environment:
       - NGINX_PORT=${NGINX_PORT}
+    depends_on:
+      - db-prod
     restart: unless-stopped
 
   db-prod:
@@ -42,6 +44,4 @@ services:
         MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "127.0.0.1:${MYSQL_PORT}:3306"
-    depends_on:
-      - php-fpm-prod
     restart: unless-stopped
