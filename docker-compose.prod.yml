@@ -30,18 +30,17 @@ services:
 
   db-prod:
     container_name: pozitiv-db-prod
-    build:
-      context: .docker/db
-      args:
-        UID: ${UID}
-        GID: ${GID}
+    image: mysql:8.4
     volumes:
-      - ${DATABASES_PATH}:/var/lib/mysql
+      - pozitiv-prod-db-data:/var/lib/mysql
     environment:
-        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        MYSQL_DATABASE: ${DB_DATABASE}
-        MYSQL_USER: ${DB_USERNAME}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "127.0.0.1:${MYSQL_PORT}:3306"
     restart: unless-stopped
+
+volumes:
+  pozitiv-prod-db-data:
