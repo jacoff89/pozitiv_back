@@ -2,8 +2,8 @@ FROM phpdockerio/php:8.4-fpm
 WORKDIR '/app'
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG UID
-ARG GID
+ARG UID=1000
+ARG GID=1000
 
 RUN usermod -u ${UID} ubuntu && groupmod -g ${GID} ubuntu
 

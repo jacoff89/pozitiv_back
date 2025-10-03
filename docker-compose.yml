@@ -25,23 +25,22 @@ services:
     environment:
       - NGINX_PORT=${NGINX_PORT}
     depends_on:
-        - db
+      - db
     restart: unless-stopped
 
   db:
     container_name: pozitiv-db
-    build:
-      context: .docker/db
-      args:
-        UID: ${UID}
-        GID: ${GID}
-    volumes:
-      - ${DATABASES_PATH}:/var/lib/mysql
+    image: mysql:8.4
     environment:
-        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        MYSQL_DATABASE: ${DB_DATABASE}
-        MYSQL_USER: ${DB_USERNAME}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pozitiv-db-data:/var/lib/mysql
     ports:
       - "127.0.0.1:${MYSQL_PORT}:3306"
     restart: unless-stopped
+
+volumes:
+  pozitiv-db-data:
