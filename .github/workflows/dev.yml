@@ -3,7 +3,7 @@ name: Деплой на дев сервер
 on:
   push:
     branches:
-      - main  # Запускать при пуше в ветку dev
+      - dev  # Запускать при пуше в ветку dev
 
 jobs:
   deploy:
